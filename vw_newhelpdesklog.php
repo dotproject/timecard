@@ -32,7 +32,7 @@ WHERE  task_log_id = $tid
 db_loadHash( $sql, $helpdeskItemTask );
 
 $is_new_record = !$tid;
-$helpdeskItemTask_found = $helpdeskItemTask['item_company_id']!=FALSE;
+$helpdeskItemTask_found = $helpdeskItemTask['item_id']!=FALSE;
 $require_task_info = $is_new_record || $helpdeskItemTask_found;
 //echo '<pre>';print_r($helpdeskItemTask);echo '</pre>';
 
@@ -59,12 +59,12 @@ if (isset( $helpdeskItemTask['task_log_date'] )) {
 $sql = "
 SELECT h.*, p.project_name, c.company_name, c.company_id
 FROM helpdesk_items h
-LEFT JOIN projects p ON p.project_id = h.item_project_id
-LEFT JOIN companies c ON c.company_id = p.project_company
+LEFT JOIN projects p ON h.item_project_id = p.project_id 
+LEFT JOIN companies c ON h.item_company_id = c.company_id
 WHERE h.item_assigned_to = $AppUI->user_id
 ORDER by p.project_name, h.item_title
 ";
-//echo "<pre>$sql</pre>";
+echo "<pre>$sql</pre>";
 
 $res = db_exec( $sql );
 echo db_error();
@@ -73,11 +73,11 @@ $project = array();
 //$companies = array( '0'=>'' );
 while ($row = db_fetch_assoc( $res )) {
 // collect help desk items in js format
-	$helpdeskItemTasks[$row['item_id']] = "[{$row['item_project_id']},{$row['item_id']},'".addslashes($row['item_title'])."', {$row['item_company_id']}]";
+	$helpdeskItemTasks[$row['item_id']] = "[{$row['item_project_id']},{$row['item_id']},'".addslashes($row['item_title'])."',{$row['item_company_id']}]";
 // collect projects in js format
 	$projects[$row['item_project_id']] = "[{$row['company_id']},{$row['item_project_id']},'".addslashes($row['project_name'])."']";
 // collect companies in normal format
-	$companies[$row['company_id']] = $row['company_name'];
+	$companies[$row['item_company_id']] = $row['company_name'];
 };
 //echo '<pre>';print_r($companies);echo '</pre>';
 //echo '<pre>';print_r($helpdeskItemTask['item_company_id']);echo '</pre>';
@@ -160,22 +160,16 @@ function addToList( list, text, value ) {
 <?php } ?>
 }
 
-/*
-function changeList( listName, source, target, use_company_field ) {
-	if(!use_company_field==null){
-		use_company_field = false;
-	}
-*/
 function changeList( listName, source, target, source_field_index ) {
 	//alert(listName+','+source+','+target);return;
 	var f = document.AddEdit;
 	var list = eval( 'f.'+listName );
 	
-// clear the options
+	// clear the options
 	emptyList( list );
 	
-// refill the list based on the target
-// add a blank first to force a change
+	// refill the list based on the target
+	// add a blank first to force a change
 	addToList( list, '', '0' );
 	for (var i=0, n = source.length; i < n; i++) {
 		if( source[i][source_field_index] == target ) {
@@ -215,14 +209,8 @@ function submitIt() {
 	} else if (f.task_log_description.value.length<1) {
 		alert( "Please enter a worthwhile comment." );
 		f.task_log_description.focus();
-	} else if ((f.item_company_id.options[f.item_company_id.selectedIndex].value==0) && (f.require_task_info.value=="true")){
-		alert( "You must select a Company." );
-		f.item_company_id.focus();
-	} else if ((f.item_project_id.options[f.item_project_id.selectedIndex].value==0) && (f.require_task_info.value=="true")){
-		alert( "You must select a Project." );
-		f.item_project_id.focus();
 	} else if ((f.task_log_help_desk_id.options[f.task_log_help_desk_id.selectedIndex].value==0) && (f.require_task_info.value=="true")){
-		alert( "You must select a Task." );
+		alert( "You must select a Help Desk Item." );
 		f.task_log_help_desk_id.focus();
 	} else {
 		f.submit();
@@ -344,7 +332,7 @@ function delIt() {
 * indicates required field
 <script language="javascript">
 changeList('item_project_id', projects, <?php echo @$helpdeskItemTask['item_company_id'] ? $helpdeskItemTask['item_company_id'] : 0;?>,0);
-changeList('task_log_help_desk_id', helpDeskItems, <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?>.0);
+changeList('task_log_help_desk_id', helpDeskItems, <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?>,3);
 
 selectList( 'item_company_id', <?php echo @$helpdeskItemTask['item_company_id'] ? $helpdeskItemTask['item_company_id'] : 0;?> );
 selectList( 'item_project_id', <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?> );
