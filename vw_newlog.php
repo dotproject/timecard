@@ -14,6 +14,8 @@ $df = $AppUI->getPref('SHDATEFORMAT');
 
 $tid = isset($_GET['tid']) ? $_GET['tid'] : 0;
 
+$winnow_project = getPermsWhereClause("projects", "projects.project_id");
+$winnow_tasks = getPermsWhereClause("tasks", "tasks.task_id");
 //pull data 
 // if we have a TID, then we editing an existing row
 $sql = " 
@@ -22,6 +24,8 @@ FROM task_log
 LEFT JOIN tasks ON task_id = task_log_task
 LEFT JOIN projects ON project_id = task_project
 WHERE  task_log_id = $tid 
+	AND $winnow_project
+	AND $winnow_tasks
 "; 
 
 db_loadHash( $sql, $task );
