@@ -1,0 +1,44 @@
+Time Card - Readme
+==================
+  A DotProject time card module .
+  Version .01 alpha - January 2003
+  --------------------------------
+  http://dotmods.sf.net
+
+    Copyright (C) 2002-2004 Dana Cordes <dcordes@warmfuzzyland.com> and New Hampshire Ball Bearing
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Summary
+=======
+
+A module that will allow user to earily see how many hours they have logged in a given week, and allow them to earily add task logs to bring that time up to the minimum required by their organization.
+
+TODO
+====
+Monthly time overview.
+Wrap permissions around each user so only authorized user can see allocated times.
+Various reports on time spent.
+
+Credits
+=======
+
+Dana Cordes <dcordes@warmfuzzyland.com>
+
+Version Information
+===================
+
+4/16/2004 Version 0.1
+Initial Release.  No known problems.
