@@ -1,4 +1,4 @@
-<?php /* HELPDESK $Id: timecard.class.php,v 1.2 2004/04/29 21:47:18 bloaterpaste Exp $ */
+<?php /* HELPDESK $Id: timecard.class.php,v 1.3 2004/04/29 23:10:45 bloaterpaste Exp $ */
 require_once( $AppUI->getSystemClass( 'dp' ) );
 //require_once( $AppUI->getSystemClass( 'libmail' ) );
 
@@ -22,6 +22,9 @@ function getPermsWhereClause($mod, $mod_id_field){
 		case "tasks":
 			$id_field = "task_id";
 			break;
+		case "helpdesk_items":
+			$id_field = "item_id";
+			break;
 		default:
 			return null;
 	}
@@ -36,6 +39,7 @@ function getPermsWhereClause($mod, $mod_id_field){
 	}
 
 	$list[] = "''";
+	$list[] = "0";
 
 	if(isset($perms[$mod])){
 		foreach($perms[$mod] as $key => $value){

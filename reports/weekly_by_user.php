@@ -1,5 +1,6 @@
 <?php 
-
+	Global $tab;
+	
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
 	//compute hours/week from config

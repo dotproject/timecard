@@ -1,13 +1,14 @@
-<?php /* TIMECARD $Id: reports.php,v 1.2 2004/01/17 14:59:45 gregorerhardt Exp $ */
+<?php /* TIMECARD $Id: vw_reports.php,v 1.2 2004/04/29 21:47:18 bloaterpaste Exp $ */
 error_reporting( E_ALL );
-Global $m,$a;
+Global $m,$a,$tab,$TIMECARD_CONFIG;
 
 $report_type = dPgetParam( $_REQUEST, "report_type", '' );
 
 // check permissions for this record
 $canRead = !getDenyRead( $m );
-if (!$canRead) {
-//	$AppUI->redirect( "m=public&a=access_denied" );
+
+if (!$TIMECARD_CONFIG['allow_reporting']) {//!$canRead || 
+	$AppUI->redirect( "m=public&a=access_denied" );
 }
 
 // get the prefered date format
@@ -19,7 +20,7 @@ $reports = $AppUI->readFiles( $AppUI->getConfig( 'root_dir' )."/modules/timecard
 $titleBlock = new CTitleBlock( 'TimeCard Reports', '', $m, "$m.$a" );
 //$titleBlock->addCrumb( "?m=timecard", "timecards list" );
 if ($report_type) {
-	$titleBlock->addCrumb( "?m=timecard&tab=2", "reports index" );
+	$titleBlock->addCrumb( "?m=timecard&tab=$tab", "reports index" );
 }
 $titleBlock->show();
 
@@ -36,7 +37,7 @@ if ($report_type) {
 		$desc = @file( $AppUI->getConfig( 'root_dir' )."/modules/timecard/reports/$desc_file" );
 
 		echo "\n<tr>";
-		echo "\n	<td><a href=\"index.php?m=timecard&tab=2&report_type=$type\">";
+		echo "\n	<td><a href=\"index.php?m=timecard&tab=$tab&report_type=$type\">";
 		echo @$desc[0] ? $desc[0] : $v;
 		echo "</a>";
 		echo "\n</td>";

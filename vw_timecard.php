@@ -1,5 +1,7 @@
 <?php 
 
+	Global $TIMECARD_CONFIG;
+
 	$m = $AppUI->checkFileName(dPgetParam( $_GET, 'm', getReadableModule() ));
 	$denyEdit = getDenyEdit( $m );
 	if ($denyEdit) {
@@ -8,6 +10,10 @@
 
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
+	$can_edit_other_timesheets = $TIMECARD_CONFIG['can_edit_other_worksheets'];
+	$show_other_worksheets = $TIMECARD_CONFIG['show_other_worksheets'];
+	$integrate_with_helpdesk = $TIMECARD_CONFIG['integrate_with_helpdesk'];
+	
 	//compute hours/week from config
 	$min_hours_week =count(explode(",",$AppUI->getConfig("cal_working_days"))) * $min_hours_day;
 	
@@ -71,6 +77,9 @@
 	?>
 			</b></td>
 			<td><a href="?m=timecard&user_id=<?php echo $user_id;?>&start_date=<?php echo urlencode($next_date->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+	<?php
+		if($show_other_worksheets){
+	?>
 			<td align="right">
 					<select name="user_id" onChange="document.user_select.submit();">
 	<?php
@@ -83,6 +92,9 @@
 					</select>
 			</td>
 			<td align="left" nowrap="nowrap"><a href="?m=timecard&tab=0&user_id=<?php echo $AppUI->user_id; ?>">[My Time Card]</a></td>
+	<?php
+		}
+	?>
 		</tr>
 	<?php
 	?>
@@ -93,8 +105,8 @@
 			<th width="1%"><?php echo $AppUI->_('Task Date'); ?></th>
 			-->
 			<th width="1%"><?php echo $AppUI->_('Task Name'); ?></th>
-			<th width="89%"><?php echo $AppUI->_('Log Entry'); ?></th>
-			<th width="10%"><?php echo $AppUI->_('Hours'); ?></th>
+			<th width="85%"><?php echo $AppUI->_('Log Entry'); ?></th>
+			<th width="14%"><?php echo $AppUI->_('Hours'); ?></th>
 		</tr>
 	<?php
 	//set the time the beginning of the first day and end of the last day.
@@ -112,6 +124,7 @@
 		." task_log_date >= \"".$start_day->format( FMT_DATETIME_MYSQL )."\" AND "
 		." task_log_date <= \"".$end_day->format( FMT_DATETIME_MYSQL )."\" "
 		." ORDER BY task_log_date";
+//print "<pre>$sql</pre>";
 	$result = db_loadList($sql);
 	$date = $start_day->format("%Y-%m-%d")." 12:00:00";
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
@@ -139,14 +152,21 @@
 				?>
 				<tr>
 					<td nowrap="nowrap" valign="top">
-					<?php if($task['task_id']){ ?><a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"];?>"><?php }
-					echo $task["task_log_name"];
-					if($task['task_id']){ ?></a><?php }
-					?></td>
+					<?php if($task['task_id']){ ?>
+						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"];?>"><?=$task["task_log_name"]?></a>
+					<?php } else if(isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']){ ?>
+						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?=$task["task_log_name"]?></a>
+					<?php } else { ?>
+						<?=$task["task_log_name"]?>
+					<?php } ?>
+					</td>
 					<td>
-					<?php if($task['task_log_creator']==$AppUI->user_id){ ?>
-					<a href="?m=timecard&tab=1&tid=<?php echo $task["task_log_id"];?>">[<?php echo $AppUI->_('Edit'); ?>]<?php ?></a>
-					<?php } ?> 
+					<?php if($task['task_log_creator']==$AppUI->user_id || $can_edit_other_timesheets){ 
+						if(!isset($task['task_log_help_desk_id']) || (isset($task['task_log_help_desk_id']) && !$task['task_log_help_desk_id']) || $integrate_with_helpdesk){
+					?>
+						<a href="?m=timecard&tab=<?=isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']?2:1?>&tid=<?=$task["task_log_id"]?>">[<?=$AppUI->_('Edit')?>]<?php ?></a>
+					<?php }
+						} ?> 
 					<?php echo $task["task_log_description"]; ?></td>
 					<td align="right" valign="top"><?php echo $task["task_log_hours"]; ?></td>
 				</tr>
@@ -170,7 +190,7 @@
 	if($total_hours_weekly<$min_hours_week){
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($min_hours_week-$total_hours_weekly)."</span></b>";
 	}
-	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\">".$total_hours_weekly."</span></b>";
+	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours_weekly."</span></b>";
 	echo "</td></tr>";
 	?>
 	</table>
@@ -197,7 +217,7 @@ function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day){
 	if($total_hours<$hours_per_day && $workday){
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($hours_per_day-$total_hours)."</span></b>";
 	}
-	echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\">".$total_hours."</span></b>";
+	echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours."</span></b>";
 	echo "</td></tr>";
 }
 

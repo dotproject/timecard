@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: setup.php,v 1.1 2004/04/16 18:27:01 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: setup.php,v 1.2 2004/04/29 22:31:36 bloaterpaste Exp $ */
 /*
 dotProject Module
 
@@ -23,6 +23,7 @@ $config['mod_type'] = 'user';
 $config['mod_ui_name'] = 'Time Card';
 $config['mod_ui_icon'] = 'TimeCard.png';
 $config['mod_description'] = 'Time Card allows easy access to a weekly timecard based on existing task logs.';
+$config['mod_config'] = true;
 
 if (@$a == 'setup') {
 	echo dPshowModuleConfig( $config );
@@ -42,19 +43,25 @@ class CSetupTimeCard {
 	Install routine
 */
 	function install() {
-		return null;
+		return true;
 	}
 /*
 	Removal routine
 */
 	function remove() {
-		return null;
+		return true;
 	}
 /*
 	Upgrade routine
 */
 	function upgrade() {
-		return null;
+		return true;
+	}
+
+	function configure() {
+		global $AppUI;
+		$AppUI->redirect("m=timecard&a=configure");
+		return true;
 	}
 }
 
