@@ -70,9 +70,9 @@ $project = array();
 $companies = array( '0'=>'' );
 while ($row = db_fetch_assoc( $res )) {
 // collect tasks in js format
-	$tasks[] = "[{$row['task_project']},{$row['task_id']},'{$row['task_name']}']";
+	$tasks[] = "[".$row['task_project'].",".$row['task_id'].",'".addslashes($row['task_name'])."']";
 // collect projects in js format
-	$projects[] = "[{$row['project_company']},{$row['task_project']},'{$row['project_name']}']";
+	$projects[] = "[".$row['project_company'].",".$row['task_project'].",'".addslashes($row['project_name'])."']";
 // collect companies in normal format
 	$companies[$row['project_company']] = $row['company_name'];
 };
