@@ -3,6 +3,9 @@
 	
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
 
+	// get date format
+	$df = $AppUI->getPref('SHDATEFORMAT');
+
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
 	//compute hours/week from config
@@ -18,6 +21,11 @@
 	}
 	$start_day = new CDate( $AppUI->getState( 'TimecardWeeklyReportStartDate' ) ? $AppUI->getState( 'TimecardWeeklyReportStartDate' ) : NULL);
 
+	if (isset( $_GET['end_date'] )) {
+		$AppUI->setState( 'TimecardWeeklyReportEndDate', $_GET['end_date'] );
+	}
+	$end_day = new CDate( $AppUI->getState( 'TimecardWeeklyReportEndDate' ) ? $AppUI->getState( 'TimecardWeeklyReportEndDate' ) : NULL);
+
 	if (isset( $_GET['company_id'] )) {
 		$AppUI->setState( 'TimecardWeeklyReportCompanyId', $_GET['company_id'] );
 	}
@@ -28,21 +36,31 @@
 	}
 	$user_id = $AppUI->getState( 'TimecardWeeklyReportPeopleId' ) ? $AppUI->getState( 'TimecardWeeklyReportPeopleId' ) : 0;
 
+	if (isset( $_GET['browse'] )) {
+		$AppUI->setState( 'TimecardWeeklyReportBrowse', $_GET['browse'] );
+	}
+	$browse = $AppUI->getState( 'TimecardWeeklyReportBrowse')=='0'?false:true;
+	
 	//set that to just midnight so as to grab the whole day
 	$date = $start_day->format("%Y-%m-%d")." 00:00:00";
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
 	
-	$today_weekday = $start_day -> getDayOfWeek();
+	if($browse){
+		$today_weekday = $start_day -> getDayOfWeek();
 
-	//roll back to the first day of that week, regardless of what day was specified
-	$rollover_day = '0';
-	$new_start_offset = $rollover_day - $today_weekday;
-	$start_day -> addDays($new_start_offset);
+		//roll back to the first day of that week, regardless of what day was specified
+		$rollover_day = '0';
+		$new_start_offset = $rollover_day - $today_weekday;
+		$start_day -> addDays($new_start_offset);
 
-	//last day of that week, add 6 days
-	$end_day = new CDate ();
-	$end_day -> copy($start_day);
-	$end_day -> addDays(6);
+		//last day of that week, add 6 days
+		$end_day = new CDate ();
+		$end_day -> copy($start_day);
+		$end_day -> addDays(6);
+	} else {
+		$week_count = 1;
+	}
+
 
 	//set that to just before midnight so as to grab the whole day
 	$date = $end_day->format("%Y-%m-%d")." 23:59:59";
@@ -122,16 +140,19 @@
 		//set that to just midnight so as to grab the whole day
 		$date = $start_day->format("%Y-%m-%d")." 00:00:00";
 		$start_day -> setDate($date, DATE_FORMAT_ISO);
-		$today_weekday = $start_day -> getDayOfWeek();
-		//roll back to the first day of that week, regardless of what day was specified
-		$rollover_day = '0';
-		$new_start_offset = $rollover_day - $today_weekday;
-		$start_day -> addDays($new_start_offset);
 
-		//last day of that week, add 6 days
-		$end_day = new CDate ();
-		$end_day -> copy($start_day);
-		$end_day -> addDays(6);
+		if($browse){
+			$today_weekday = $start_day -> getDayOfWeek();
+			//roll back to the first day of that week, regardless of what day was specified
+			$rollover_day = '0';
+			$new_start_offset = $rollover_day - $today_weekday;
+			$start_day -> addDays($new_start_offset);
+
+			//last day of that week, add 6 days
+			$end_day = new CDate ();
+			$end_day -> copy($start_day);
+			$end_day -> addDays(6);
+		}
 
 		//set that to just midnight so as to grab the whole day
 		$date = $start_day->format("%Y-%m-%d")." 00:00:00";
@@ -203,7 +224,8 @@
 		unset($result);
 //print "<pre>".print_r($projects, true)."</pre><hr>";
 
-		$start_day -> addDays(-7);
+		if($browse)
+			$start_day -> addDays(-7);
 	}
 
 	$sql = "SELECT company_id, company_name FROM companies WHERE ".getPermsWhereClause("companies", "company_id")." ORDER BY company_name";
@@ -214,20 +236,91 @@
 	$next_day -> copy($start_day);
 	$next_day -> addDays($week_count*7*2);
 ?>
-<form name="frmCompanySelect" action="" method="get">
+<script language="javascript">
+var calendarField = '';
+
+function popCalendar( field ){
+	calendarField = field;
+	idate = eval( 'document.frmSelect.' + field + '_date.value' );
+	window.open( 'index.php?m=public&a=calendar&dialog=1&callback=setCalendar&date=' + idate, 'calwin', 'top=250,left=250,width=250, height=220, scollbars=false' );
+}
+
+/**
+ *	@param string Input date in the format YYYYMMDD
+ *	@param string Formatted date
+ */
+function setCalendar( idate, fdate ) {
+	fld_date = eval( 'document.frmSelect.' + calendarField + '_date' );
+	fld_fdate = eval( 'document.frmSelect.' + calendarField );
+	fld_date.value = idate;
+	fld_fdate.value = fdate;
+}
+
+function toggle(obj){
+	var browse = document.getElementById("browse");
+	var select = document.getElementById("select");
+	if(obj.value=="<?=$AppUI->_('Browse By Week')?>"){
+		obj.value="<?=$AppUI->_('Date Range')?>";
+		select.style.visibility="hidden";
+		browse.style.visibility="visible";
+	} else {
+		obj.value="<?=$AppUI->_('Browse By Week')?>";
+		browse.style.visibility="hidden";
+		select.style.visibility="visible";
+	}
+}
+</script>
+<form name="frmSelect" action="" method="get">
 	<input type="hidden" name="m" value="timecard">
 	<input type="hidden" name="report_type" value="weekly_by_project">
 	<input type="hidden" name="tab" value="<?=$tab?>">
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
-		<td width="95%"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
-                          $company_id )?><?=arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
+		<td width="1%" valign="top" nowrap="nowrap"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
+                          $company_id )?><?=arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
                           $user_id )?></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-		<td width="1%" nowrap="nowrap">&nbsp;|&nbsp;</td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+		<td width="1%" valign="top">
+			<input type="button" value="<?=$browse?$AppUI->_('Date Range'):$AppUI->_('Browse By Week')?>" onClick="toggle(this)">
+		</td>
+		<td width="98%" align="right" valign="top">
+		<div id="browse" style="visibility:<?=$browse?'visible':'hidden'?>;position:absolute;text-align:right;" align="right">
+			<table cellpadding="0" cellspacing="0" width="1%">
+				<tr>
+					<td width="95%">&nbsp;</td>
+					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>&browse=1"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+					<td width="1%" nowrap="nowrap" style="padding-left:5px"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>&browse=1"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+					<td width="1%">&nbsp;|&nbsp;</td>
+					<td width="1%" nowrap="nowrap" style="padding-right:5px"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+				</tr>
+			</table>
+		</div>
+		<div id="select" style="visibility:<?=$browse?'hidden':'visible'?>;position:absolute;text-align:right;" align="right">
+			<table cellpadding="0" cellspacing="0" width="1%">
+				<tr>
+					<td width="97%">&nbsp;</td>
+					<td nowrap="nowrap" width="1%">
+						<input type="hidden" name="browse" value="0" />
+						<input type="hidden" name="start_date" value="<?=$start_day->format( FMT_TIMESTAMP_DATE );?>" />
+						<input type="text" name="start" value="<?=$start_day->format( $df );?>" class="text" disabled="disabled" />
+						<a href="#" onClick="popCalendar('start')">
+							<img src="./images/calendar.gif" width="24" height="12" alt="<?=$AppUI->_('Calendar');?>" border="0" />
+						</a>
+					</td>
+					<td nowrap="nowrap" width="1%">
+						<input type="hidden" name="end_date" value="<?=$end_day ? $end_day->format( FMT_TIMESTAMP_DATE ) : '';?>" />
+						<input type="text" name="end" value="<?=$end_day ? $end_day->format( $df ) : '';?>" class="text" disabled="disabled" />
+						<a href="#" onClick="popCalendar('end')">
+							<img src="./images/calendar.gif" width="24" height="12" alt="<?=$AppUI->_('Calendar');?>" border="0" />
+						</a>
+					</td>
+					<td width="1%">
+						<input type="submit">
+					</td>
+				</tr>
+			</table>
+		</div>
+		</td>
 	</tr>
 	</table>
 
@@ -247,7 +340,7 @@
 <?php
 	if(!isset($projects)){
 ?>
-	<tr><td align="center" colspan="<?=($week_count+1)?>><?=$AppUI->_('No Data Available')?></td></tr>
+	<tr><td align="center" colspan="<?=($week_count+1)?>"><?=$AppUI->_('No Data Available')?></td></tr>
 <?php
 	} else {
 		$image_straight = '<img src="./modules/timecard/images/verticle-dots.png" width="16" height="12" border="0">';
@@ -321,9 +414,8 @@
 		foreach($project['users'] as $id => $person){
 ?>
 <tr>
-	<td><?=!$last_department?$image_straight:$image_shim?><?=!$last_project?$image_straight:$image_shim?><?=$image_elbow?><?=$people[$id]['name']?></td>
+	<td><?=!$last_department?$image_straight:$image_shim?><?=!$last_project?$image_straight:$image_shim?><?=$image_elbow?><?=isset($people[$id]['name'])?$people[$id]['name']:$id?></td>
 <?php
-echo "";
 			for($i=$week_count-1;$i>=0;$i--){
 				 $hours = isset($person[$i])?$person[$i]:0;
 				 $hours = round($hours,2);
