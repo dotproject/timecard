@@ -315,7 +315,7 @@ function delIt() {
 <tr>
 	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Description');?></td>
 	<td align="left">
-		<textarea name="task_log_description" cols="60" rows="3" wrap="virtual" class="textarea"><?php echo (($tid > 0) ? $task["task_log_description"] : "");?></textarea>
+		<textarea name="task_log_description" cols="60" rows="6" wrap="virtual" class="textarea"><?php echo (($tid > 0) ? $task["task_log_description"] : "");?></textarea>
 	</td>
 </tr>
 <tr>
