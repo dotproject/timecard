@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: setup.php,v 1.1 2004/04/15 21:12:49 dcordes Exp $ */
+<?php /* TIMECARD $Id: setup.php,v 1.1 2004/04/16 18:27:01 bloaterpaste Exp $ */
 /*
 dotProject Module
 
@@ -16,7 +16,7 @@ If it is accessed directory it will give a summary of the module parameters.
 // MODULE CONFIGURATION DEFINITION
 $config = array();
 $config['mod_name'] = 'TimeCard';
-$config['mod_version'] = '0.1';
+$config['mod_version'] = '0.2';
 $config['mod_directory'] = 'timecard';
 $config['mod_setup_class'] = 'CSetupTimeCard';
 $config['mod_type'] = 'user';
