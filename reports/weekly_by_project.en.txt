@@ -1,0 +1,2 @@
+Time Logged Weekly, by Project
+A summary of the last 4 weeks time logged by each project.
