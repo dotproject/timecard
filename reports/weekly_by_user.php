@@ -74,6 +74,27 @@
 	
 	if(isset($ids))
 	for($i=0;$i<$week_count;$i++){
+		//set that to just midnight so as to grab the whole day
+		$date = $start_day->format("%Y-%m-%d")." 00:00:00";
+		$start_day -> setDate($date, DATE_FORMAT_ISO);
+		$today_weekday = $start_day -> getDayOfWeek();
+		//roll back to the first day of that week, regardless of what day was specified
+		$rollover_day = '0';
+		$new_start_offset = $rollover_day - $today_weekday;
+		$start_day -> addDays($new_start_offset);
+
+		//last day of that week, add 6 days
+		$end_day = new CDate ();
+		$end_day -> copy($start_day);
+		$end_day -> addDays(6);
+
+		//set that to just midnight so as to grab the whole day
+		$date = $start_day->format("%Y-%m-%d")." 00:00:00";
+		$start_day -> setDate($date, DATE_FORMAT_ISO);
+		//set that to just before midnight so as to grab the whole day
+		$date = $end_day->format("%Y-%m-%d")." 23:59:59";
+		$end_day -> setDate($date, DATE_FORMAT_ISO);
+
 		$start_month = $start_day->format("%b");
 		$end_month = $end_day->format("%b");
 		$start_date = $start_day->format("%e");
@@ -105,13 +126,6 @@
 		}
 
 		$start_day -> addDays(-7);
-		$end_day -> addDays(-7);
-		//set that to just midnight so as to grab the whole day
-		$date = $start_day->format("%Y-%m-%d")." 00:00:00";
-		$start_day -> setDate($date, DATE_FORMAT_ISO);
-		//set that to just before midnight so as to grab the whole day
-		$date = $end_day->format("%Y-%m-%d")." 23:59:59";
-		$end_day -> setDate($date, DATE_FORMAT_ISO);
 	}
 
 /*
