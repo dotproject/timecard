@@ -70,11 +70,11 @@
 	echo $start_day -> getDayName(false). " " .$start_day->format( $df )."</b> ".$AppUI->_('through')." <b>".$end_day -> getDayName(false). " " .$end_day->format( $df );
 	?>
 			</b></td>
-			<td><a href="?m=timecard&user_id=<?php echo $user_id;?>&start_date=<?php echo urlencode($next_date->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+			<td><a href="?m=timecard&user_id=<?php echo $user_id;?>&start_date=<?php echo urlencode($next_date->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 			<td align="right">
 					<select name="user_id" onChange="document.user_select.submit();">
 	<?php
-		$sql = "SELECT user_id, user_first_name, user_last_name FROM users WHERE ".getPermsWhereClause("companies", "user_company")." ORDER BY user_last_name, user_first_name";
+		$sql = "SELECT user_id, user_first_name, user_last_name FROM users WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
 		$result = db_loadList($sql);
 		foreach ($result as $user) {
 			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["user_last_name"].", ".$user["user_first_name"]."</option>\n";

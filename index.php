@@ -1,4 +1,4 @@
-<?php /* HISTORY $Id: index.php,v 1.6 2004/04/15 21:16:20 dcordes Exp $ */
+<?php /* HISTORY $Id: index.php,v 1.1 2004/04/16 18:27:01 bloaterpaste Exp $ */
 
 // check permissions
 $denyRead = getDenyRead( $m );
@@ -21,12 +21,8 @@ $tab = $AppUI->getState( 'TimecardVwTab' ) ? $AppUI->getState( 'TimecardVwTab' )
 
 $tabBox = new CTabBox( "?m=timecard", "./modules/timecard/", $tab );
 $tabBox->add( 'vw_timecard', 'Weekly Time Card' );
-/*
-$tabBox->add( 'vw_monthly', 'Monthly' );
-$tabBox->add( 'vw_reports', 'Reports' );
-*/
+//$tabBox->add( 'vw_monthly', 'Monthly' );
 $tabBox->add( 'vw_newlog', 'Task Log' );
+$tabBox->add( 'vw_reports', 'Reports' );
 $tabBox->show();
-
-
 ?>
