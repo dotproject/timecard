@@ -64,7 +64,7 @@ LEFT JOIN companies c ON h.item_company_id = c.company_id
 WHERE h.item_assigned_to = $AppUI->user_id
 ORDER by p.project_name, h.item_title
 ";
-echo "<pre>$sql</pre>";
+//echo "<pre>$sql</pre>";
 
 $res = db_exec( $sql );
 echo db_error();
