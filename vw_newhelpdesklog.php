@@ -243,6 +243,9 @@ function delIt() {
 	}
 ?>
  
+<?php 
+	if(!$is_new_record && $helpdeskItemTask_found){
+?>
 <table border="0" cellpadding="4" cellspacing="0" width="98%">
 <tr>
 	<td width="50%" align="right">
@@ -250,6 +253,9 @@ function delIt() {
 	</td>
 </tr>
 </table>
+<?php 
+	}
+?>
 
 <table cellspacing="0" cellpadding="4" border="0" width="98%" class="std">
 <tr>
