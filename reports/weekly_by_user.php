@@ -128,28 +128,14 @@
 			$people[$row['task_log_creator']][$i] = $row['hours'];
 		}
 
+		$date = $start_day->format("%Y-%m-%d")." 12:00:00";
+		$start_day -> setDate($date, DATE_FORMAT_ISO);
 		$start_day -> addDays(-7);
 	}
-
-/*
-	print "<table>";
-	foreach($people as $row){
-		print "<tr><td>";
-		print implode("</td><td>", $row);
-		print "</td></tr>";
-		print "\n";
-	}
-	print "</table>";
-	
-	print "<pre>";
-	print_r($people);
-	print "</pre>";
-*/
 
 	$sql = "SELECT company_id, company_name FROM companies WHERE ".getPermsWhereClause("companies", "company_id")." ORDER BY company_name";
 	$companies = arrayMerge( array( 0 => $AppUI->_('All Companies') ), db_loadHashList( $sql ) );
 
-	//last day of that week, add 6 days
 	$next_day = new CDate ();
 	$next_day -> copy($start_day);
 	$next_day -> addDays($week_count*7*2);
