@@ -68,7 +68,9 @@ require_once( $CONFIG_FILE );
 
 //Read the current config values from the config file and update the array.
 foreach ($config_options as $key=>$value){
-	$config_options[$key]['value']=$TIMECARD_CONFIG[$key];
+	if(isset($TIMECARD_CONFIG[$key])){
+		$config_options[$key]['value']=$TIMECARD_CONFIG[$key];
+	}
 }
 
 // setup the title block
