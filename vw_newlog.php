@@ -254,7 +254,7 @@ function delIt() {
 
 <table cellspacing="0" cellpadding="4" border="0" width="98%" class="std">
 <tr>
-	<th colspan="2"><?php echo $tid?$AppUI->_('Editing'):$AppUI->_('Creating New'); ?> Help Desk Log</th>
+	<th colspan="2"><?php echo $tid?$AppUI->_('Editing'):$AppUI->_('Creating New')." ".$AppUI->_('Task Log'); ?> </th>
 </tr>
 <?php
 /*	
@@ -269,7 +269,7 @@ function delIt() {
 */
 ?>
 <tr>
-	<td align="right" nowrap="nowrap">Company:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Company');?>:</td>
 	<td>
 	<?php
 		$params = 'size="1" class="text" style="width:250px" ';
@@ -279,13 +279,13 @@ function delIt() {
 	</td>
 </tr>
 <tr>
-	<td align="right" nowrap="nowrap">Project:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Project');?>:</td>
 	<td>
 		<select name="task_project" class="text" style="width:250px" onchange="changeList('task_log_task',tasks, this.options[this.selectedIndex].value)"></select>
 	</td>
 </tr>
 <tr>
-	<td align="right" nowrap="nowrap">Task:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Task');?>:</td>
 	<td>
 		<select name="task_log_task" class="text" style="width:250px"></select>
 		<input type="hidden" name="task_log_name" value="">
@@ -295,7 +295,7 @@ function delIt() {
 //	}
 ?>
 <tr>
-	<td align="right" nowrap="nowrap">Date:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Date');?>* :</td>
 	<td>
 		<input type="hidden" name="task_log_date" value="<?php echo $date->getDate();?>">
 		<input type="text" name="date" value="<?php echo $date->format($df);?>" class="text" disabled="disabled">
@@ -306,14 +306,14 @@ function delIt() {
 	</td>
 </tr>
 <tr>
-	<td align="right" nowrap="nowrap">Hours *</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Hours');?>* :</td>
 	<td>
 		<input type="text" name="task_log_hours" value="<?php echo (($tid > 0) ? $task["task_log_hours"] : "");?>" class="text" size="4" maxlength="10">
 	</td>
 
 </tr>
 <tr>
-	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Description');?></td>
+	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Description');?>* :</td>
 	<td align="left">
 		<textarea name="task_log_description" cols="60" rows="6" wrap="virtual" class="textarea"><?php echo (($tid > 0) ? $task["task_log_description"] : "");?></textarea>
 	</td>
