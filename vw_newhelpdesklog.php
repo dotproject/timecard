@@ -70,7 +70,7 @@ $res = db_exec( $sql );
 echo db_error();
 $helpdeskItemTasks = array();
 $project = array();
-//$companies = array( '0'=>'' );
+$companies = array();
 while ($row = db_fetch_assoc( $res )) {
 // collect help desk items in js format
 	$helpdeskItemTasks[$row['item_id']] = "[{$row['item_project_id']},{$row['item_id']},'".addslashes($row['item_title'])."',{$row['item_company_id']}]";
