@@ -186,7 +186,7 @@
 				user_department,
 				project_id, 
 				project_name, 
-				project_departments,
+				project_department,
 				project_company,
 				company_name,
 				sum(task_log_hours) as hours
@@ -208,7 +208,7 @@
 //		print "<pre>$sql</pre>";
 		$result = db_loadList($sql);
 
-		$department_field = $report_department_type=='project'?'project_departments':'user_department';
+		$department_field = $report_department_type=='project'?'project_department':'user_department';
 
 		foreach($result as $row){
 			//pull the department numbers apart, and populate them with their names.
