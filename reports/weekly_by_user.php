@@ -79,7 +79,8 @@
 		$start_date = $start_day->format("%e");
 		$end_date = $end_day->format("%e");
 	
-		$starts[$i] =  "$start_month $start_date-".($start_month==$end_month?$end_date:"$end_month $end_date");
+		$start_data_pretty[$i] =  "$start_month $start_date-".($start_month==$end_month?$end_date:"$end_month $end_date");
+		$start_data_linkable[$i] =  urlencode($start_day->getDate()) ;
 //		$starts[$i] =  $start_day->format($df);
 
 		$sql = "
@@ -166,17 +167,17 @@
 	<th><?=$AppUI->_('User')?></th>
 	<th><?=$AppUI->_('Company')?></th>
 <?php
-	if(isset($starts))
+	if(isset($start_data_pretty))
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<th><?=$starts[$i]?></th>
+	<th><?=$start_data_pretty[$i]?></th>
 <?php
 	}
 ?>
 </tr>
 <?php
 	if(isset($people))
-	foreach($people as $person){
+	foreach($people as $id => $person){
 ?>
 <tr>
 	<td nowrap="nowrap"><?=$person['name']?></td>
@@ -186,7 +187,7 @@
 		 $hours = isset($person[$i])?$person[$i]:0;
 		 $hours = round($hours,2);
 ?>
-	<td <?=$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><?=$hours?></td>
+	<td <?=$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><a href="?m=timecard&user_id=<?=$id?>&tab=0&start_date=<?=$start_data_linkable[$i]?>"><?=$hours?></a></td>
 <?php
 	}
 ?>
