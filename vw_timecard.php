@@ -18,7 +18,7 @@
 //	print_r($AppUI);
 //	print "</pre>";
 	//compute hours/week from config
-	$min_hours_week =count(explode(",",$AppUI->getConfig("cal_working_days"))) * $min_hours_day;
+	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
 	
 	// get date format
 	$df = $AppUI->getPref('SHDATEFORMAT');

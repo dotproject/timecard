@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: vw_reports.php,v 1.4 2004/05/13 18:17:05 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: vw_reports.php,v 1.5 2004/05/20 19:14:35 bloaterpaste Exp $ */
 error_reporting( E_ALL );
 Global $m,$a,$tab,$TIMECARD_CONFIG;
 
@@ -16,7 +16,7 @@ $AppUI->savePlace();
 // get the prefered date format
 $df = $AppUI->getPref('SHDATEFORMAT');
 
-$reports = $AppUI->readFiles( $AppUI->getConfig( 'root_dir' )."/modules/timecard/reports", "\.php$" );
+$reports = $AppUI->readFiles( dPgetConfig( 'root_dir' )."/modules/timecard/reports", "\.php$" );
 
 // setup the title block
 $titleBlock = new CTitleBlock( 'TimeCard Reports', '', $m, "$m.$a" );
@@ -29,14 +29,14 @@ $titleBlock->show();
 if ($report_type) {
 	$report_type = $AppUI->checkFileName( $report_type );
 	$report_type = str_replace( ' ', '_', $report_type );
-	require( $AppUI->getConfig( 'root_dir' )."/modules/timecard/reports/$report_type.php" );
+	require( dPgetConfig( 'root_dir' )."/modules/timecard/reports/$report_type.php" );
 } else {
 	echo "<table>";
 	echo "<tr><td><h2>" . $AppUI->_( 'Reports Available' ) . "</h2></td></tr>";
 	foreach ($reports as $v) {
 		$type = str_replace( ".php", "", $v );
 		$desc_file = str_replace( ".php", ".$AppUI->user_locale.txt", $v );
-		$desc = @file( $AppUI->getConfig( 'root_dir' )."/modules/timecard/reports/$desc_file" );
+		$desc = @file( dPgetConfig( 'root_dir' )."/modules/timecard/reports/$desc_file" );
 
 		echo "\n<tr>";
 		echo "\n	<td><a href=\"index.php?m=timecard&tab=$tab&report_type=$type\">";

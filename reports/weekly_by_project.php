@@ -9,7 +9,7 @@
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
 	//compute hours/week from config
-	$min_hours_week =count(explode(",",$AppUI->getConfig("cal_working_days"))) * $min_hours_day;
+	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
 	// get date format
 	$df = $AppUI->getPref('SHDATEFORMAT');
 	
