@@ -1,4 +1,4 @@
-<?php /* HISTORY $Id: index.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
+<?php /* HISTORY $Id: index.php,v 1.4 2004/05/13 18:17:05 bloaterpaste Exp $ */
 
 // check permissions
 $denyRead = getDenyRead( $m );
@@ -7,7 +7,6 @@ $denyEdit = getDenyEdit( $m );
 if ($denyRead) {
 	$AppUI->redirect( "m=help&a=access_denied" );
 }
-$AppUI->savePlace();
 
 $TIMECARD_CONFIG = array();
 require_once( "./modules/timecard/config.php" );

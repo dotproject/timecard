@@ -46,6 +46,8 @@ if (!$can_edit_other_timesheets)
 	}
 }
 
+$AppUI->savePlace();
+
 if (isset( $task['task_log_date'] )) {
 	$date = new CDate( $task['task_log_date'] ); 
 } else if (isset( $_GET['date'] )) {

@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: vw_reports.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: vw_reports.php,v 1.4 2004/05/13 18:17:05 bloaterpaste Exp $ */
 error_reporting( E_ALL );
 Global $m,$a,$tab,$TIMECARD_CONFIG;
 
@@ -10,6 +10,8 @@ $canRead = !getDenyRead( $m );
 if(!$TIMECARD_CONFIG['minimum_report_level']>=$AppUI->user_type){
 	$AppUI->redirect( "m=public&a=access_denied" );
 }
+
+$AppUI->savePlace();
 
 // get the prefered date format
 $df = $AppUI->getPref('SHDATEFORMAT');

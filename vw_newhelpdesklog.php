@@ -39,13 +39,13 @@ $require_task_info = $is_new_record || $helpdeskItemTask_found;
 Global $TIMECARD_CONFIG;
 //Prevent users from editing other ppls timecards.
 $can_edit_other_timesheets = $TIMECARD_CONFIG['minimum_edit_level']>=$AppUI->user_type;
-if (!$can_edit_other_timesheets)
-{
-	if(isset($_GET['tid']) && ((isset($helpdeskItemTask['item_created_by']) && $helpdeskItemTask['item_created_by'] != $AppUI->user_id) || (!isset($helpdeskItemTask['item_created_by']))))
-	{
+if (!$can_edit_other_timesheets){
+	if(isset($_GET['tid']) && ((isset($helpdeskItemTask['task_log_creator']) && $helpdeskItemTask['task_log_creator'] != $AppUI->user_id)) ){
 		$AppUI->redirect( "m=public&a=access_denied" );
 	}
 }
+
+$AppUI->savePlace();
 
 if (isset( $helpdeskItemTask['task_log_date'] )) {
 	$date = new CDate( $helpdeskItemTask['task_log_date'] ); 
