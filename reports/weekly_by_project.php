@@ -255,20 +255,6 @@ function setCalendar( idate, fdate ) {
 	fld_date.value = idate;
 	fld_fdate.value = fdate;
 }
-
-function toggle(obj){
-	var browse = document.getElementById("browse");
-	var select = document.getElementById("select");
-	if(obj.value=="<?=$AppUI->_('Browse By Week')?>"){
-		obj.value="<?=$AppUI->_('Date Range')?>";
-		select.style.visibility="hidden";
-		browse.style.visibility="visible";
-	} else {
-		obj.value="<?=$AppUI->_('Browse By Week')?>";
-		browse.style.visibility="hidden";
-		select.style.visibility="visible";
-	}
-}
 </script>
 <form name="frmSelect" action="" method="get">
 	<input type="hidden" name="m" value="timecard">
@@ -279,11 +265,7 @@ function toggle(obj){
 		<td width="1%" valign="top" nowrap="nowrap"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
                           $company_id )?><?=arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
                           $user_id )?></td>
-		<td width="1%" valign="top">
-			<input type="button" value="<?=$browse?$AppUI->_('Date Range'):$AppUI->_('Browse By Week')?>" onClick="toggle(this)">
-		</td>
 		<td width="98%" align="right" valign="top">
-		<div id="browse" style="visibility:<?=$browse?'visible':'hidden'?>;position:absolute;text-align:right;" align="right">
 			<table cellpadding="0" cellspacing="0" width="1%">
 				<tr>
 					<td width="95%">&nbsp;</td>
@@ -294,8 +276,6 @@ function toggle(obj){
 					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 				</tr>
 			</table>
-		</div>
-		<div id="select" style="visibility:<?=$browse?'hidden':'visible'?>;position:absolute;text-align:right;" align="right">
 			<table cellpadding="0" cellspacing="0" width="1%">
 				<tr>
 					<td width="97%">&nbsp;</td>
@@ -315,11 +295,10 @@ function toggle(obj){
 						</a>
 					</td>
 					<td width="1%">
-						<input type="submit">
+						<input type="submit" value="<?=$AppUI->_('Report on Date Range')?>">
 					</td>
 				</tr>
 			</table>
-		</div>
 		</td>
 	</tr>
 	</table>
