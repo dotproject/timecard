@@ -1,6 +1,5 @@
 <?php 
 
-
 	$m = $AppUI->checkFileName(dPgetParam( $_GET, 'm', getReadableModule() ));
 	$denyEdit = getDenyEdit( $m );
 	if ($denyEdit) {
@@ -16,6 +15,11 @@
 	$df = $AppUI->getPref('SHDATEFORMAT');
 
 	if (isset( $_GET['user_id'] )) {
+		$sql = "SELECT user_company FROM users WHERE user_id = ".$_GET['user_id'] ;
+		$company_id = db_loadResult( $sql );
+		if(getDenyRead( "companies", $company_id )){
+			$AppUI->redirect( "m=public&a=access_denied" );
+		}
 		$AppUI->setState( 'TimecardSelectedUser', $_GET['user_id'] );
 	}
 	$user_id = $AppUI->getState( 'TimecardSelectedUser' ) ? $AppUI->getState( 'TimecardSelectedUser' ) : $AppUI->user_id;
@@ -77,8 +81,6 @@
 		}
 	?>
 					</select>
-<?="<pre>$sql</pre>"?>
-
 			</td>
 			<td align="left" nowrap="nowrap"><a href="?m=timecard&tab=0&user_id=<?php echo $AppUI->user_id; ?>">[My Time Card]</a></td>
 		</tr>
