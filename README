@@ -51,7 +51,7 @@ Version Information
 ===================
 
 2004-05-13
-
+Made the textareas in the helpdeskitem and tasklog tabs larger.
 Added module configuration.
 Added configuration options for toggling highlighting of undertime hours.
 Added configuration options for minimum user level selection for displaying reports, showing or editing other users timecards.
