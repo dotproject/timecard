@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: vw_reports.php,v 1.2 2004/04/29 21:47:18 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: vw_reports.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
 error_reporting( E_ALL );
 Global $m,$a,$tab,$TIMECARD_CONFIG;
 
@@ -7,7 +7,7 @@ $report_type = dPgetParam( $_REQUEST, "report_type", '' );
 // check permissions for this record
 $canRead = !getDenyRead( $m );
 
-if (!$TIMECARD_CONFIG['allow_reporting']) {//!$canRead || 
+if(!$TIMECARD_CONFIG['minimum_report_level']>=$AppUI->user_type){
 	$AppUI->redirect( "m=public&a=access_denied" );
 }
 

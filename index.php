@@ -1,4 +1,4 @@
-<?php /* HISTORY $Id: index.php,v 1.2 2004/04/29 21:47:18 bloaterpaste Exp $ */
+<?php /* HISTORY $Id: index.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
 
 // check permissions
 $denyRead = getDenyRead( $m );
@@ -29,7 +29,7 @@ $tabBox->add( 'vw_newlog', 'Task Log' );
 if($TIMECARD_CONFIG['integrate_with_helpdesk']){
 	$tabBox->add( 'vw_newhelpdesklog', 'Helpdesk Log' );
 }
-if($TIMECARD_CONFIG['allow_reporting']){
+if($TIMECARD_CONFIG['minimum_report_level']>=$AppUI->user_type){
 	$tabBox->add( 'vw_reports', 'Reports' );
 }
 $tabBox->show();

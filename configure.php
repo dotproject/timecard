@@ -8,27 +8,41 @@ if (!$canEdit) {
 	$AppUI->redirect( "m=public&a=access_denied" );
 }
 
+@include_once( "./functions/admin_func.php" );
+
 $CONFIG_FILE = "./modules/timecard/config.php";
 
 $AppUI->savePlace();
 
+//define user type list
+$user_types = arrayMerge( $utypes, array( '-1' => $AppUI->_('None') ) );
+
 //All config options, their descriptions and their default values are defined here.  
+//Add new config options here.  type can be "checkbox", "text", or "select".  If it's "select"
+//then be sure to include a 'list' entry with the options.
 $config_options = array(
-	"can_edit_other_worksheets" => array(
-		"description" => $AppUI->_('Allow editing of other users time cards.'),
-		"value" => 0
+	'minimum_report_level' => array(
+		'description' => $AppUI->_('Minimum user level to access Reports.'),
+		'value' => 0,
+		'type' => 'select',
+		'list' => @$user_types
 	),
-	"show_other_worksheets" => array(
-		"description" => $AppUI->_('Allow users to see other users timesheets.'),
-		"value" => 0
+	'minimum_see_level' => array(
+		'description' => $AppUI->_('Minimum user level to see others timecards.'),
+		'value' => 0,
+		'type' => 'select',
+		'list' => @$user_types
 	),
-	"allow_reporting" => array(
-		"description" => $AppUI->_('Allow users access to the reporting area.'),
-		"value" => 0
+	'minimum_edit_level' => array(
+		'description' => $AppUI->_('Minimum user level to edit others timecards.'),
+		'value' => 0,
+		'type' => 'select',
+		'list' => @$user_types
 	),
-	"integrate_with_helpdesk" => array(
-		"description" => $AppUI->_('Allow integration with HelpDesk module.'),
-		"value" => 0
+	'integrate_with_helpdesk' => array(
+		'description' => $AppUI->_('Allow integration with HelpDesk module.'),
+		'value' => 0,
+		'type' => 'checkbox'
 	)
 );
 
@@ -46,10 +60,22 @@ if(dPgetParam( $_POST, "Save", '' )!=''){
 			exit;
 		} else {
 			foreach ($config_options as $key=>$value){
-				//$TIMECARD_CONFIG['can_edit_other_worksheets'] = 1;
-				$val = isset($_POST[$key])?"1":"0";
-
-				fwrite($handle, "\$TIMECARD_CONFIG['".$key."'] = ".$val.";\n");
+				$val="";
+				switch($value['type']){
+					case 'checkbox': 
+						$val = isset($_POST[$key])?"1":"0";
+						break;
+					case 'text': 
+						$val = isset($_POST[$key])?$_POST[$key]:"";
+						break;
+					case 'select': 
+						$val = isset($_POST[$key])?$_POST[$key]:"0";
+						break;
+					default:
+						break;
+				}
+				
+				fwrite($handle, "\$TIMECARD_CONFIG['".$key."'] = '".$val."';\n");
 			}
 
 			fwrite($handle, "?> \n");
@@ -79,8 +105,6 @@ $titleBlock->addCrumb( "?m=system", "system admin" );
 $titleBlock->addCrumb( "?m=system&a=viewmods", "modules list" );
 $titleBlock->show();
 
-//$= @file( $AppUI->getConfig( 'root_dir' )."/modules/timecard/reports/$desc_file" );
-
 ?>
 
 <form method="post">
@@ -90,7 +114,23 @@ foreach ($config_options as $key=>$value){
 ?>
 	<tr>
 		<td align="left"><?=$value['description']?></td>
-		<td><input type="checkbox" name="<?=$key?>" <?=$value['value']?"checked":""?>></td>
+		<td><?php
+		switch($value['type']){
+			case 'checkbox': ?>
+				<input type="checkbox" name="<?=$key?>" <?=$value['value']?"checked=\"checked\"":""?>>
+				<?php
+				break;
+			case 'text': ?>
+				<input type="text" name="<?=$key?>" value="<?=$value['value']?>">
+				<?php
+				break;
+			case 'select': 
+				print arraySelect( $value["list"], $key, 'class=text size=1', $value["value"] );
+				break;
+			default:
+				break;
+		}
+		?></td>
 	</tr>
 <?php	
 }

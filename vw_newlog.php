@@ -37,13 +37,12 @@ $require_task_info = $is_new_record || $task_found;
 
 Global $TIMECARD_CONFIG;
 //Prevent users from editing other ppls timecards.
-$can_edit_other_timesheets = $TIMECARD_CONFIG['can_edit_other_worksheets'];
+$can_edit_other_timesheets = $TIMECARD_CONFIG['minimum_edit_level']>=$AppUI->user_type;
 if (!$can_edit_other_timesheets)
 {
-	if(isset($_GET['tid']) && $task['task_log_creator'] && $task['task_log_creator'] != $AppUI->user_id)
+	if(isset($_GET['tid']) && ((isset($v['task_log_creator']) && $task['task_log_creator'] != $AppUI->user_id) || (!isset($task['task_log_creator']))))
 	{
-		echo "<br><br><b>You cannot edit someone elses timecard entry.</b>";
-		unset($task);
+		$AppUI->redirect( "m=public&a=access_denied" );
 	}
 }
 
@@ -255,7 +254,7 @@ function delIt() {
 
 <table cellspacing="0" cellpadding="4" border="0" width="98%" class="std">
 <tr>
-	<th colspan="2"><?php echo $tid?$AppUI->_('Editing'):$AppUI->_('Creating New'); ?> Task Log</th>
+	<th colspan="2"><?php echo $tid?$AppUI->_('Editing'):$AppUI->_('Creating New'); ?> Help Desk Log</th>
 </tr>
 <?php
 /*	

@@ -10,10 +10,12 @@
 
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
-	$can_edit_other_timesheets = $TIMECARD_CONFIG['can_edit_other_worksheets'];
-	$show_other_worksheets = $TIMECARD_CONFIG['show_other_worksheets'];
+	$can_edit_other_timesheets = $TIMECARD_CONFIG['minimum_edit_level']>=$AppUI->user_type;
+	$show_other_worksheets = $TIMECARD_CONFIG['minimum_see_level']>=$AppUI->user_type;
 	$integrate_with_helpdesk = $TIMECARD_CONFIG['integrate_with_helpdesk'];
-	
+//	print "<pre>";
+//	print_r($AppUI);
+//	print "</pre>";
 	//compute hours/week from config
 	$min_hours_week =count(explode(",",$AppUI->getConfig("cal_working_days"))) * $min_hours_day;
 	

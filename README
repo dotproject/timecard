@@ -30,10 +30,16 @@ INSTALL
 =======
 Just dump this module into the modules directory and it'll work.  It makes no database changes.  To allow configuration, make sure that the config.php file is writable by dotproject.
 
+You can configure report availablity, viewing others timecards and editing others timecards based on the user type of each user.  This is done in the configuration options in the View Modules section of the System Admin module.
+
 TODO
 ====
 Monthly time overview.
 Various reports on time spent.
+
+KNOWN ISSUES
+============
+-There's a problem with using "edit others timecards" and company permissions.  If a user trys to edit another users timecard that they would not normally have access too then things will break.
 
 Credits
 =======
