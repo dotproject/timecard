@@ -1,4 +1,4 @@
-<?php /* TASKS $Id: do_updatetasklog.php,v 1.1 2004/03/20 01:17:35 dcordes Exp $ */
+<?php /* TASKS $Id: do_updatetasklog.php,v 1.1 2004/04/16 18:27:01 bloaterpaste Exp $ */
 
 //There is an issue with international UTF characters, when stored in the database an accented letter
 //actually takes up two letters per say in the field length, this is a problem with costcodes since
@@ -68,6 +68,7 @@ if ($del) {
 		$AppUI->redirect();
 	} else {
 		$AppUI->setMsg( @$_POST['task_log_id'] ? 'updated' : 'inserted', UI_MSG_OK, true );
+		$AppUI->redirect("m=timecard&tab=0");
 	}
 }
 
