@@ -43,6 +43,11 @@ $config_options = array(
 		'description' => $AppUI->_('Allow integration with HelpDesk module.'),
 		'value' => 0,
 		'type' => 'checkbox'
+	),
+	'show_possible_hours_worked' => array(
+		'description' => $AppUI->_('Highlight the hours a user had not worked.'),
+		'value' => 0,
+		'type' => 'checkbox'
 	)
 );
 

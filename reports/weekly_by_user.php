@@ -1,6 +1,8 @@
 <?php 
-	Global $tab;
+	Global $tab,$TIMECARD_CONFIG;
 	
+	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
+
 	//grab hours per day from config
 	$min_hours_day = $AppUI->cfg['daily_working_hours'];
 	//compute hours/week from config
@@ -202,7 +204,7 @@
 		 $hours = isset($person[$i])?$person[$i]:0;
 		 $hours = round($hours,2);
 ?>
-	<td <?=$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><a href="?m=timecard&user_id=<?=$id?>&tab=0&start_date=<?=$start_data_linkable[$i]?>"><?=$hours?></a></td>
+	<td <?=$show_possible_hours_worked&&$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><a href="?m=timecard&user_id=<?=$id?>&tab=0&start_date=<?=$start_data_linkable[$i]?>"><?=$hours?></a></td>
 <?php
 	}
 ?>

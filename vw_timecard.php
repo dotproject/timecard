@@ -13,6 +13,7 @@
 	$can_edit_other_timesheets = $TIMECARD_CONFIG['minimum_edit_level']>=$AppUI->user_type;
 	$show_other_worksheets = $TIMECARD_CONFIG['minimum_see_level']>=$AppUI->user_type;
 	$integrate_with_helpdesk = $TIMECARD_CONFIG['integrate_with_helpdesk'];
+	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
 //	print "<pre>";
 //	print_r($AppUI);
 //	print "</pre>";
@@ -178,7 +179,7 @@
 		}
 
 
-		writeDayTotal($AppUI->_('Total Hours'),$last_day->isWorkingDay(),$total_hours_daily,$min_hours_day);
+		writeDayTotal($AppUI->_('Total Hours'),$last_day->isWorkingDay(),$total_hours_daily,$min_hours_day, $show_possible_hours_worked);
 		$total_hours_weekly += $total_hours_daily;
 		$total_hours_daily = 0;
 		$last_day->addDays(1);
@@ -189,7 +190,7 @@
 
 	echo "<tr><th nowrap=\"nowrap\" valign=\"top\" colspan=\"4\" ><div align=\"left\"><b>".$AppUI->_('For the week of')." ".$start_day -> getDayName(false). " " .$start_day->format( $df )." ".$AppUI->_('through')." ".$end_day -> getDayName(false). " " .$end_day->format( $df )."</b></div></th></tr>";;
 	echo "<tr><td colspan=\"2\" align=\"right\"><b>".$AppUI->_('Total Hours')."</b></td><td align=\"right\">";
-	if($total_hours_weekly<$min_hours_week){
+	if($show_possible_hours_worked && $total_hours_weekly<$min_hours_week){
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($min_hours_week-$total_hours_weekly)."</span></b>";
 	}
 	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours_weekly."</span></b>";
@@ -213,10 +214,10 @@ function writeDayLine($day,$format,$task_string,$show_add){
 	echo "</tr>";
 }
 
-function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day){
+function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day, $show_possible_hours_worked){
 	echo "<tr><td colspan=\"2\" align=\"right\"><b>".$total_string."</b></td>";
 	echo "<td align=\"right\" >";
-	if($total_hours<$hours_per_day && $workday){
+	if($show_possible_hours_worked && $total_hours<$hours_per_day && $workday){
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($hours_per_day-$total_hours)."</span></b>";
 	}
 	echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours."</span></b>";
