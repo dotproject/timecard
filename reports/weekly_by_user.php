@@ -157,16 +157,16 @@
 <form name="frmCompanySelect" action="" method="get">
 	<input type="hidden" name="m" value="timecard">
 	<input type="hidden" name="report_type" value="weekly_by_user">
-	<input type="hidden" name="tab" value="2">
+	<input type="hidden" name="tab" value="<?=$tab?>">
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
 		<td width="95%"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
                           $company_id )?></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=2&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=2&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>2&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
 		<td width="1%" nowrap="nowrap">&nbsp;|&nbsp;</td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=2&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=2&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 	</tr>
 	</table>
 
