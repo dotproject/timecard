@@ -57,7 +57,7 @@ if (isset( $helpdeskItemTask['task_log_date'] )) {
 
 // get user -> help desk items
 $sql = "
-SELECT h.item_id, h.item_title, h.item_project_id, p.project_name, c.company_name, c.company_id
+SELECT h.*, p.project_name, c.company_name, c.company_id
 FROM helpdesk_items h
 LEFT JOIN projects p ON p.project_id = h.item_project_id
 LEFT JOIN companies c ON c.company_id = p.project_company
@@ -70,10 +70,10 @@ $res = db_exec( $sql );
 echo db_error();
 $helpdeskItemTasks = array();
 $project = array();
-$companies = array( '0'=>'' );
+//$companies = array( '0'=>'' );
 while ($row = db_fetch_assoc( $res )) {
 // collect help desk items in js format
-	$helpdeskItemTasks[$row['item_id']] = "[{$row['item_project_id']},{$row['item_id']},'".addslashes($row['item_title'])."']";
+	$helpdeskItemTasks[$row['item_id']] = "[{$row['item_project_id']},{$row['item_id']},'".addslashes($row['item_title'])."', {$row['item_company_id']}]";
 // collect projects in js format
 	$projects[$row['item_project_id']] = "[{$row['company_id']},{$row['item_project_id']},'".addslashes($row['project_name'])."']";
 // collect companies in normal format
@@ -85,7 +85,7 @@ while ($row = db_fetch_assoc( $res )) {
 if ($helpdeskItemTask_found)
 {
 	// need to add the entry for the helpdesk itself as that was not found
-	$helpdeskItemTasks[$helpdeskItemTask['item_id']] = "[{$helpdeskItemTask['item_project_id']}, {$helpdeskItemTask['item_id']}, '{$helpdeskItemTask['item_title']}']";
+	$helpdeskItemTasks[$helpdeskItemTask['item_id']] = "[{$helpdeskItemTask['item_project_id']}, {$helpdeskItemTask['item_id']}, '{$helpdeskItemTask['item_title']}', {$helpdeskItemTask['item_company_id']}]";
 	// get the project name
 	$sql = "SELECT project_name FROM projects WHERE project_id = ".$helpdeskItemTask['item_project_id'];
 	$itemCompanyName = db_LoadResult($sql);
@@ -160,7 +160,13 @@ function addToList( list, text, value ) {
 <?php } ?>
 }
 
-function changeList( listName, source, target ) {
+/*
+function changeList( listName, source, target, use_company_field ) {
+	if(!use_company_field==null){
+		use_company_field = false;
+	}
+*/
+function changeList( listName, source, target, source_field_index ) {
 	//alert(listName+','+source+','+target);return;
 	var f = document.AddEdit;
 	var list = eval( 'f.'+listName );
@@ -172,7 +178,7 @@ function changeList( listName, source, target ) {
 // add a blank first to force a change
 	addToList( list, '', '0' );
 	for (var i=0, n = source.length; i < n; i++) {
-		if( source[i][0] == target ) {
+		if( source[i][source_field_index] == target ) {
 			addToList( list, source[i][2], source[i][1] );
 		}
 	}
@@ -280,7 +286,7 @@ function delIt() {
 	<td>
 	<?php
 		$params = 'size="1" class="text" style="width:250px" ';
-		$params .= 'onchange="changeList(\'item_project_id\',projects, this.options[this.selectedIndex].value)"';
+		$params .= 'onchange="changeList(\'item_project_id\',projects, this.options[this.selectedIndex].value,0);changeList(\'task_log_help_desk_id\',helpDeskItems, this.options[this.selectedIndex].value,3)"';
 		echo arraySelect( $companies, 'item_company_id', $params, @$helpdeskItemTask['item_company_id'] );
 	?>
 	</td>
@@ -288,7 +294,7 @@ function delIt() {
 <tr>
 	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Project');?>:</td>
 	<td>
-		<select name="item_project_id" class="text" style="width:250px" onchange="changeList('task_log_help_desk_id',helpDeskItems, this.options[this.selectedIndex].value)"></select>
+		<select name="item_project_id" class="text" style="width:250px" onchange="changeList('task_log_help_desk_id',helpDeskItems, this.options[this.selectedIndex].value,0)"></select>
 	</td>
 </tr>
 <tr>
@@ -337,8 +343,8 @@ function delIt() {
 </form>
 * indicates required field
 <script language="javascript">
-changeList('item_project_id', projects, <?php echo @$helpdeskItemTask['item_company_id'] ? $helpdeskItemTask['item_company_id'] : 0;?>);
-changeList('task_log_help_desk_id', helpDeskItems, <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?>);
+changeList('item_project_id', projects, <?php echo @$helpdeskItemTask['item_company_id'] ? $helpdeskItemTask['item_company_id'] : 0;?>,0);
+changeList('task_log_help_desk_id', helpDeskItems, <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?>.0);
 
 selectList( 'item_company_id', <?php echo @$helpdeskItemTask['item_company_id'] ? $helpdeskItemTask['item_company_id'] : 0;?> );
 selectList( 'item_project_id', <?php echo @$helpdeskItemTask['item_project_id'] ? $helpdeskItemTask['item_project_id'] : 0;?> );
