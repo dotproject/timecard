@@ -10,12 +10,11 @@ if ($denyEdit) {
 }
 
 require_once $AppUI->getSystemClass('date');
+require_once $AppUI->getModuleClass('helpdesk');
 $df = $AppUI->getPref('SHDATEFORMAT');
 
 $tid = isset($_GET['tid']) ? $_GET['tid'] : 0;
 
-$winnow_project = getPermsWhereClause("projects", "helpdesk_items.item_project_id");
-$winnow_helpdeskitems = getPermsWhereClause("helpdesk_items", "helpdesk_items.item_id");
 //pull data 
 // if we have a TID, then we editing an existing row
 $sql = " 
@@ -23,8 +22,7 @@ SELECT task_log.*, item_id, item_project_id, item_title, item_company_id
 FROM task_log
 LEFT JOIN helpdesk_items ON task_log_help_desk_id = item_id
 WHERE  task_log_id = $tid 
-	AND $winnow_project
-	AND $winnow_helpdeskitems
+AND ".getItemPerms()."
 "; 
 //echo "<pre>$sql</pre>";
 //echo '<pre>';print_r($sql);echo '</pre>';
@@ -61,7 +59,7 @@ SELECT h.*, p.project_name, c.company_name, c.company_id
 FROM helpdesk_items h
 LEFT JOIN projects p ON h.item_project_id = p.project_id 
 LEFT JOIN companies c ON h.item_company_id = c.company_id
-WHERE h.item_assigned_to = $AppUI->user_id
+WHERE ".getItemPerms()."
 ORDER by p.project_name, h.item_title
 ";
 //echo "<pre>$sql</pre>";
