@@ -1,4 +1,4 @@
-<?php /* HELPDESK $Id: timecard.class.php,v 1.1 2004/04/29 16:11:35 bloaterpaste Exp $ */
+<?php /* HELPDESK $Id: timecard.class.php,v 1.2 2004/04/29 21:47:18 bloaterpaste Exp $ */
 require_once( $AppUI->getSystemClass( 'dp' ) );
 //require_once( $AppUI->getSystemClass( 'libmail' ) );
 
@@ -25,9 +25,10 @@ function getPermsWhereClause($mod, $mod_id_field){
 		default:
 			return null;
 	}
-
-	if((isset($perms[$mod][-1]) && ($perms[$mod][-1]==1 || $perms[$mod][-1]==-1)) || 
-     (isset($perms["all"][-1]) && ($perms["all"][-1]==1 || $perms["all"][-1]==-1))) {
+	if(
+		(isset($perms[$mod]['-1']) && ($perms[$mod]['-1']=='1' || $perms[$mod]['-1']=='-1')) || 
+     		(isset($perms["all"]['-1']) && ($perms["all"]['-1']=='1' || $perms["all"]['-1']=='-1'))
+     	) {
 		$sql = "SELECT $id_field FROM $mod";
 		$list = db_loadColumn( $sql );
 	} else {
