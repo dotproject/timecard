@@ -162,11 +162,15 @@
 	<tr>
 		<td width="95%"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
                           $company_id )?></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>2&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+                <?php
+                	$prev_url = "?m=timecard&tab=$tab&report_type=weekly_by_user&start_date=".urlencode($start_day->getDate());
+                	$next_url = "?m=timecard&tab=$tab&report_type=weekly_by_user&start_date=".urlencode($next_day->getDate());
+                ?>
+		<td width="1%" nowrap="nowrap"><a href="<?=$prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?=$prev_url?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
 		<td width="1%" nowrap="nowrap">&nbsp;|&nbsp;</td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_user&start_date=<?php echo urlencode($next_day->getDate()) ;?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?=$next_url?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?=$next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 	</tr>
 	</table>
 

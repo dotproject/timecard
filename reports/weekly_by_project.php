@@ -282,12 +282,16 @@ function setCalendar( idate, fdate ) {
 		<td width="98%" align="right" valign="top">
 			<table cellpadding="0" cellspacing="0" width="1%">
 				<tr>
+					<?php
+						$prev_url = "?m=timecard&tab=$tab&report_type=weekly_by_project&start_date=".urlencode($start_day->getDate())."&browse=1";
+						$next_url = "?m=timecard&tab=$tab&report_type=weekly_by_project&start_date=".urlencode($next_day->getDate())."&browse=1";
+					?>
 					<td width="95%">&nbsp;</td>
-					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>&browse=1"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-					<td width="1%" nowrap="nowrap" style="padding-left:5px"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>&browse=1"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+					<td width="1%"><a href="<?=$prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+					<td width="1%" nowrap="nowrap" style="padding-left:5px"><a href="<?=$prev_url?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
 					<td width="1%">&nbsp;|&nbsp;</td>
-					<td width="1%" nowrap="nowrap" style="padding-right:5px"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+					<td width="1%" nowrap="nowrap" style="padding-right:5px"><a href="<?=$next_url?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+					<td width="1%"><a href="<?=$next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 				</tr>
 			</table>
 		</td>
