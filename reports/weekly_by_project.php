@@ -23,6 +23,11 @@
 	}
 	$company_id = $AppUI->getState( 'TimecardWeeklyReportCompanyId' ) ? $AppUI->getState( 'TimecardWeeklyReportCompanyId' ) : 0;
 
+	if (isset( $_GET['user_id'] )) {
+		$AppUI->setState( 'TimecardWeeklyReportPeopleId', $_GET['user_id'] );
+	}
+	$user_id = $AppUI->getState( 'TimecardWeeklyReportPeopleId' ) ? $AppUI->getState( 'TimecardWeeklyReportPeopleId' ) : 0;
+
 	//set that to just midnight so as to grab the whole day
 	$date = $start_day->format("%Y-%m-%d")." 00:00:00";
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
@@ -43,7 +48,7 @@
 	$date = $end_day->format("%Y-%m-%d")." 23:59:59";
 	$end_day -> setDate($date, DATE_FORMAT_ISO);
 
-	//Get has of users
+	//Get hash of users
 	$sql = "
 		SELECT 
 			user_id,
@@ -58,6 +63,26 @@
 
 	foreach($result as $row){
 		$people[$row['user_id']] = $row;
+		$users[$row['user_id']] = $row['name'];
+	}
+	unset($result);
+
+	$users = arrayMerge( array( 0 => $AppUI->_('All Users') ), $users );
+
+
+	//Get hash of departments
+	$sql = "
+		SELECT 
+			dept_id,
+			dept_name
+		FROM 
+			departments
+		ORDER BY dept_name
+	";
+	$result = db_loadList($sql);	
+	$departments = array();
+	foreach($result as $row){
+		$departments[$row['dept_id']] = $row['dept_name'];
 	}
 	unset($result);
 
@@ -84,7 +109,7 @@
 
 	for($i=0;$i<count($result);$i++){
 		$project_id = $result[$i]['project_id'];
-		$projects[$project_id] = $result[$i];
+//		$projects[$project_id] = $result[$i];
 //		$projects[$project_id]['totals'] = array();
 //		$projects[$project_id]['users'] = array();
 		$ids[] = $project_id;
@@ -124,36 +149,63 @@
 		$start_data_linkable[$i] =  urlencode($start_day->getDate()) ;
 //		$starts[$i] =  $start_day->format($df);
 
-		$sql = "
+		$sql = '
 			SELECT 
 				task_log_creator,
 				project_id, 
 				project_name, 
+				project_departments,
+				project_company,
+				company_name,
 				sum(task_log_hours) as hours
 			FROM 
 				task_log
 				left join tasks on task_log.task_log_task = tasks.task_id
 				left join projects on tasks.task_project = projects.project_id
+				left join companies on projects.project_company = companies.company_id
 			WHERE
-				project_id in (".implode(", ",$ids).")
+				project_id in ('.implode(", ",$ids).")
 				AND task_log_date >= '".$start_day->format( FMT_DATETIME_MYSQL )."' 
-				AND task_log_date <= '".$end_day->format( FMT_DATETIME_MYSQL )."'
-			GROUP BY
-				project_id, task_log.task_log_creator
-		";
+				AND task_log_date <= '".$end_day->format( FMT_DATETIME_MYSQL )."'"
+				.($user_id>0?" AND task_log_creator = $user_id ":'').'
+				GROUP BY
+				project_company,project_id, task_log.task_log_creator
+		';
 
 //		print "<pre>$sql</pre>";
 		$result = db_loadList($sql);
 
 		foreach($result as $row){
-			$projects[$row['project_id']]['users'][$row['task_log_creator']][$i] = $row['hours'];
-			@$projects[$row['project_id']]['totals'][$i] += $row['hours'];
+			//pull the department numbers apart, and populate them with their names.
+			if($row['project_departments']!=null && strlen($row['project_departments'])>0){
+				$department_list = explode(',',$row['project_departments']);
+				for($c=0;$c<count($department_list);$c++){
+					if(isset($departments[$department_list[$c]])){
+						$department_list[$c] = $departments[$department_list[$c]];
+					}
+				}
+			} else {
+				$department_list = array($AppUI->_('No Department'));
+			}
+			foreach($department_list as $department){
+				if(!isset($projects[$row['company_name']]['departments'][$department]['projects'][$row['project_id']]['project_name'])){
+					$projects[$row['company_name']]['departments'][$department]['projects'][$row['project_id']] = array(
+						'project_name' => $row['project_name']
+					);
+				}
+				$projects[$row['company_name']]['departments'][$department]['projects'][$row['project_id']]['users'][$row['task_log_creator']][$i] = $row['hours']/count($department_list);
+				
+				@$projects[$row['company_name']]['departments'][$department]['projects'][$row['project_id']]['totals'][$i] += $row['hours']/count($department_list);
+				@$projects[$row['company_name']]['departments'][$department]['totals'][$i] += $row['hours']/count($department_list);
+				@$projects[$row['company_name']]['totals'][$i] += $row['hours']/count($department_list);
+			}
 		}
+		unset($result);
+//print "<pre>".print_r($projects, true)."</pre><hr>";
 
 		$start_day -> addDays(-7);
 	}
 
-//print "<pre>".print_r($projects, true)."</pre>";
 	$sql = "SELECT company_id, company_name FROM companies WHERE ".getPermsWhereClause("companies", "company_id")." ORDER BY company_name";
 	$companies = arrayMerge( array( 0 => $AppUI->_('All Companies') ), db_loadHashList( $sql ) );
 
@@ -169,7 +221,8 @@
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
 		<td width="95%"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
-                          $company_id )?></td>
+                          $company_id )?><?=arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
+                          $user_id )?></td>
 		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
 		<td width="1%" nowrap="nowrap"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($start_day->getDate()) ;?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
 		<td width="1%" nowrap="nowrap">&nbsp;|&nbsp;</td>
@@ -180,17 +233,8 @@
 
 </form>
 <table cellspacing="1" cellpadding="2" border="0" class="std" width="100%">
-<?php
-	if(!isset($projects)){
-?>
-	<tr><td align="center"><?=$AppUI->_('No Users Available')?></td></tr>
-<?php
-	} else {
-
-?>
 <tr>
 	<th><?=$AppUI->_('Project/UserName')?></th>
-	<th><?=$AppUI->_('Company')?></th>
 <?php
 	if(isset($start_data_pretty))
 	for($i=$week_count-1;$i>=0;$i--){
@@ -201,19 +245,73 @@
 ?>
 </tr>
 <?php
+	if(!isset($projects)){
+?>
+	<tr><td align="center" colspan="<?=($week_count+1)?>><?=$AppUI->_('No Data Available')?></td></tr>
+<?php
+	} else {
+		$image_straight = '<img src="./modules/timecard/images/verticle-dots.png" width="16" height="12" border="0">';
+		$image_elbow= '<img src="./images/corner-dots.gif" width="16" height="12" border="0">';
+		$image_shim= '<img src="./images/shim.gif" width="16" height="12" border="0">';
+
+?>
+<?php
 	if(isset($projects))
-	foreach($projects as $id => $project){
+	foreach($projects as $id => $company){
+		if(!next($projects)){
+			$last_company=true;
+		} else {
+			$last_company=false;
+		}
+?>
+<tr>
+	<td style="background:#8AC6FF;"><?=$id?></td>
+<?php
+	for($i=$week_count-1;$i>=0;$i--){
+?>
+	<td style="background:#8AC6FF;"><?=isset($company['totals'][$i])?round($company['totals'][$i],2):"0"?></td>
+<?php
+	}
+?>
+</tr>
+<?php
+
+	foreach($company['departments'] as $id => $department){
+		if(!next($company['departments'])){
+			$last_department=true;
+		} else {
+			$last_department=false;
+		}
+?>
+<tr>
+	<td style="background:#A7D4FF;"><?=$image_elbow?><?=$id?></td>
+<?php
+	for($i=$week_count-1;$i>=0;$i--){
+?>
+	<td style="background:#A7D4FF;"><?=isset($department['totals'][$i])?round($department['totals'][$i],2):"0"?></td>
+<?php
+	}
+?>
+</tr>
+<?php
+
+	foreach($department['projects'] as $id => $project){
+		if(!next($department['projects'])){
+			$last_project=true;
+		} else {
+			$last_project=false;
+		}
+
 	//only display projects with time assigned
 
 	if(isset($project['totals'])){
 ?>
 <tr>
-	<td nowrap="nowrap" style="border-top:1px solid #BBBBBB;border-bottom:1px solid #BBBBBB;background:#EEEEEE;"><a href="?m=projects&a=view&project_id=<?=$id?>"><?=$project['project_name']?></a></td>
-	<td nowrap="nowrap" style="border-top:1px solid #BBBBBB;border-bottom:1px solid #BBBBBB;background:#EEEEEE;" ><?=$project['company_name']?></td>
+	<td nowrap="nowrap" style="background:#C0E0FF;"><?=!$last_department?$image_straight:$image_shim?><?=$image_elbow?><a href="?m=projects&a=view&project_id=<?=$id?>"><?=$project['project_name']?></a></td>
 <?php
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<td style="border-top:1px solid #BBBBBB;border-bottom:1px solid #BBBBBB;background:#EEEEEE;"><?=isset($project['totals'][$i])?round($project['totals'][$i],2):"0"?></td>
+	<td style="background:#C0E0FF;"><?=isset($project['totals'][$i])?round($project['totals'][$i],2):"0"?></td>
 <?php
 	}
 ?>
@@ -223,7 +321,7 @@
 		foreach($project['users'] as $id => $person){
 ?>
 <tr>
-	<td colspan="2">&nbsp;&nbsp;&nbsp;<?=$people[$id]['name']?></td>
+	<td><?=!$last_department?$image_straight:$image_shim?><?=!$last_project?$image_straight:$image_shim?><?=$image_elbow?><?=$people[$id]['name']?></td>
 <?php
 echo "";
 			for($i=$week_count-1;$i>=0;$i--){
@@ -240,6 +338,8 @@ echo "";
 ?>
 </tr>
 <?php
+	}
+	}
 	}
 	}
 }
