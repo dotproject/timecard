@@ -70,13 +70,15 @@
 			<td align="right">
 					<select name="user_id" onChange="document.user_select.submit();">
 	<?php
-		$sql = "SELECT user_id, user_first_name, user_last_name FROM users ORDER BY user_last_name, user_first_name";
+		$sql = "SELECT user_id, user_first_name, user_last_name FROM users WHERE ".getPermsWhereClause("companies", "user_company")." ORDER BY user_last_name, user_first_name";
 		$result = db_loadList($sql);
 		foreach ($result as $user) {
 			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["user_last_name"].", ".$user["user_first_name"]."</option>\n";
 		}
 	?>
 					</select>
+<?="<pre>$sql</pre>"?>
+
 			</td>
 			<td align="left" nowrap="nowrap"><a href="?m=timecard&tab=0&user_id=<?php echo $AppUI->user_id; ?>">[My Time Card]</a></td>
 		</tr>
