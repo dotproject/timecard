@@ -16,6 +16,11 @@
 	//How many weeks are we going to show?
 	$week_count = 4;
 		
+	$report_department_types = array(
+		'project' => $AppUI->_('Project Department'),
+		'user' => $AppUI->_('User Department')
+		);
+	
 	if (isset( $_GET['start_date'] )) {
 		$AppUI->setState( 'TimecardWeeklyReportStartDate', $_GET['start_date'] );
 	}
@@ -40,7 +45,12 @@
 		$AppUI->setState( 'TimecardWeeklyReportBrowse', $_GET['browse'] );
 	}
 	$browse = $AppUI->getState( 'TimecardWeeklyReportBrowse')=='0'?false:true;
-	
+
+	if (isset( $_GET['report_department_type'] )) {
+		$AppUI->setState( 'TimecardWeeklyReportDepartmentType', $_GET['report_department_type'] );
+	}
+	$report_department_type = $AppUI->getState( 'TimecardWeeklyReportDepartmentType')!=NULL?$AppUI->getState( 'TimecardWeeklyReportDepartmentType'):key($report_department_types);
+
 	//set that to just midnight so as to grab the whole day
 	$date = $start_day->format("%Y-%m-%d")." 00:00:00";
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
@@ -173,6 +183,7 @@
 		$sql = '
 			SELECT 
 				task_log_creator,
+				user_department,
 				project_id, 
 				project_name, 
 				project_departments,
@@ -183,6 +194,7 @@
 				task_log
 				left join tasks on task_log.task_log_task = tasks.task_id
 				left join projects on tasks.task_project = projects.project_id
+				left join users on task_log.task_log_creator = users.user_id
 				left join companies on projects.project_company = companies.company_id
 			WHERE
 				project_id in ('.implode(", ",$ids).")
@@ -196,10 +208,12 @@
 //		print "<pre>$sql</pre>";
 		$result = db_loadList($sql);
 
+		$department_field = $report_department_type=='project'?'project_departments':'user_department';
+
 		foreach($result as $row){
 			//pull the department numbers apart, and populate them with their names.
-			if($row['project_departments']!=null && strlen($row['project_departments'])>0){
-				$department_list = explode(',',$row['project_departments']);
+			if($row[$department_field]!=null && strlen($row[$department_field])>0){
+				$department_list = explode(',',$row[$department_field]);
 				for($c=0;$c<count($department_list);$c++){
 					if(isset($departments[$department_list[$c]])){
 						$department_list[$c] = $departments[$department_list[$c]];
@@ -276,9 +290,14 @@ function setCalendar( idate, fdate ) {
 					<td width="1%"><a href="?m=timecard&tab=<?=$tab?>&report_type=weekly_by_project&start_date=<?php echo urlencode($next_day->getDate()) ;?>&browse=1"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 				</tr>
 			</table>
-			<table cellpadding="0" cellspacing="0" width="1%">
+		</td>
+	</tr>
+	<tr>
+		<td width="98%" valign="top" colspan="2">
+			
+			<table cellpadding="0" cellspacing="0" width="100%">
 				<tr>
-					<td width="97%">&nbsp;</td>
+					<td width="97%"><?=arraySelect($report_department_types, 'report_department_type',  'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $report_department_type)?></td>
 					<td nowrap="nowrap" width="1%">
 						<input type="hidden" name="browse" value="0" />
 						<input type="hidden" name="start_date" value="<?=$start_day->format( FMT_TIMESTAMP_DATE );?>" />
