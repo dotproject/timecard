@@ -81,18 +81,6 @@
 			<td align="left" nowrap="nowrap"><a href="?m=timecard&tab=0&user_id=<?php echo $AppUI->user_id; ?>">[My Time Card]</a></td>
 		</tr>
 	<?php
-	
-	$sql = "SELECT task_log.*, tasks.task_id 
-		FROM 
-			task_log 
-			LEFT JOIN tasks on task_log.task_log_task = tasks.task_id
-		WHERE "
-		." task_log_creator=".$user_id." AND"
-		." task_log_date >= \"".$start_day->format( FMT_DATETIME_MYSQL )."\" AND "
-		." task_log_date <= \"".$end_day->format( FMT_DATETIME_MYSQL )."\" "
-		." ORDER BY task_log_date";
-	$result = db_loadList($sql);
-	
 	?>
 	<table width="100%" border="0" cellpadding="2" cellspacing="1" class="tbl">
 		<tr>
@@ -105,6 +93,25 @@
 			<th width="10%"><?php echo $AppUI->_('Hours'); ?></th>
 		</tr>
 	<?php
+	//set the time the beginning of the first day and end of the last day.
+	$date = $start_day->format("%Y-%m-%d")." 00:00:00";
+	$start_day -> setDate($date, DATE_FORMAT_ISO);
+	$date = $end_day->format("%Y-%m-%d")." 23:59:59";
+	$end_day -> setDate($date, DATE_FORMAT_ISO);
+
+	$sql = "SELECT task_log.*, tasks.task_id 
+		FROM 
+			task_log 
+			LEFT JOIN tasks on task_log.task_log_task = tasks.task_id
+		WHERE "
+		." task_log_creator=".$user_id." AND"
+		." task_log_date >= \"".$start_day->format( FMT_DATETIME_MYSQL )."\" AND "
+		." task_log_date <= \"".$end_day->format( FMT_DATETIME_MYSQL )."\" "
+		." ORDER BY task_log_date";
+	$result = db_loadList($sql);
+	$date = $start_day->format("%Y-%m-%d")." 12:00:00";
+	$start_day -> setDate($date, DATE_FORMAT_ISO);
+
 	$rowspan_count=0;
 	$total_hours_daily=0;
 	$total_hours_weekly=0;
@@ -119,6 +126,7 @@
 
 		foreach ($result as $task) {
 			$task_date = new CDate( $task["task_log_date"] );
+
 			$task_dow = $task_date->getDayOfWeek();
 
 			if($task_dow==$dow){
@@ -148,6 +156,9 @@
 		$total_hours_weekly += $total_hours_daily;
 		$total_hours_daily = 0;
 		$last_day->addDays(1);
+		$date = $last_day->format("%Y-%m-%d")." 12:00:00";
+		$last_day -> setDate($date, DATE_FORMAT_ISO);
+
 	}
 
 	echo "<tr><th nowrap=\"nowrap\" valign=\"top\" colspan=\"4\" ><div align=\"left\"><b>".$AppUI->_('For the week of')." ".$start_day -> getDayName(false). " " .$start_day->format( $df )." ".$AppUI->_('through')." ".$end_day -> getDayName(false). " " .$end_day->format( $df )."</b></div></th></tr>";;
