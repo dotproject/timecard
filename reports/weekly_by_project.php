@@ -7,7 +7,8 @@
 	$df = $AppUI->getPref('SHDATEFORMAT');
 
 	//grab hours per day from config
-	$min_hours_day = $AppUI->cfg['daily_working_hours'];
+//	$min_hours_day = $AppUI->cfg['daily_working_hours'];
+	$min_hours_day = dPgetConfig("daily_working_hours");
 	//compute hours/week from config
 	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
 	// get date format
@@ -77,15 +78,9 @@
 	$end_day -> setDate($date, DATE_FORMAT_ISO);
 
 	//Get hash of users
-	$sql = "
-		SELECT 
-			user_id,
-			concat(user_first_name,' ',user_last_name) as name,
-			user_email
-		FROM 
-			users
-		ORDER BY user_last_name, user_first_name
-	";
+//Pedro A.
+	$sql = "SELECT user_id, contact_email, concat(contact_first_name,' ',contact_last_name) as name FROM users LEFT JOIN contacts AS c ON users.user_contact = contact_id ORDER BY contact_first_name, contact_last_name;";
+//End Pedro A.
 	$result = db_loadList($sql);	
 	$people = array();
 
@@ -99,14 +94,7 @@
 
 
 	//Get hash of departments
-	$sql = "
-		SELECT 
-			dept_id,
-			dept_name
-		FROM 
-			departments
-		ORDER BY dept_name
-	";
+	$sql = "SELECT dept_id, dept_name FROM departments ORDER BY dept_name;";
 	$result = db_loadList($sql);	
 	$departments = array();
 	foreach($result as $row){

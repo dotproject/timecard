@@ -10,6 +10,12 @@ if ($denyEdit) {
 }
 
 require_once $AppUI->getSystemClass('date');
+
+//***START MOD*** pedroa 20050609
+require_once( $AppUI->getModuleClass( 'projects' ) );
+GLOBAL $AppUI;
+//***END MOD
+
 $df = $AppUI->getPref('SHDATEFORMAT');
 
 $tid = isset($_GET['tid']) ? $_GET['tid'] : 0;
@@ -73,7 +79,7 @@ ORDER by p.project_name, t.task_name
 $res = db_exec( $sql );
 echo db_error();
 $tasks = array();
-$project = array();
+$projects = array();
 $companies = array( '0'=>'' );
 while ($row = db_fetch_assoc( $res )) {
 // collect tasks in js format
@@ -100,6 +106,36 @@ if ($task_found)
 //$sql = "SELECT company_id, company_name FROM companies ORDER BY company_name";
 //$companies = arrayMerge( array( '0'=>'' ), db_loadHashList( $sql ) );
 
+//***START MOD trimble 20050609
+// Lets check which cost codes have been used before
+/*$sql = "select distinct task_log_costcode
+from task_log
+where task_log_costcode != ''
+order by task_log_costcode";
+$task_log_costcodes = array(""); // Let's add a blank default option
+$task_log_costcodes = array_merge($task_log_costcodes, db_loadColumn($sql));
+*/
+
+$proj = &new CProject();
+$proj->load($obj->task_project);
+$sql = "SELECT billingcode_id, billingcode_name
+FROM billingcode
+WHERE billingcode_status=0
+AND company_id='$proj->project_company'
+ORDER BY billingcode_name";
+
+$task_log_costcodes[0]="None";
+$ptrc = db_exec($sql);
+echo db_error();
+$nums = 0;
+if ($ptrc)
+$nums=db_num_rows($ptrc);
+for ($x=0; $x < $nums; $x++) {
+$row = db_fetch_assoc( $ptrc );
+$task_log_costcodes[$row["billingcode_id"]] = $row["billingcode_name"];
+}
+//***END MOD
+
 ##
 ## Set up JavaScript arrays
 ##
@@ -113,6 +149,7 @@ $s = "\nvar tasks = new Array(".implode( ",\n", $tasks ).")";
 $s .= "\nvar projects = new Array(".implode( ",\n", $projects ).")";
 
 echo "<script language=\"javascript\">$s</script>";
+
 ?>
 
 <script language="javascript">
@@ -225,6 +262,7 @@ function delIt() {
 		form.submit();
 	}
 }
+
 </script>
 
 <form name="AddEdit" action="" method="post">
@@ -242,7 +280,8 @@ function delIt() {
 	}
 	else
 	{
-		echo "<input type='hidden' name='task_log_creator' value=".$AppUI->user_id."/>";
+		//***MOD 20050525 pedroa echo "<input type='hidden' name='task_log_creator' value=".$AppUI->user_id."/>";
+		echo "<input type='hidden' name='task_log_creator' value=".$_GET['userid']."/>";
 	}
 ?>
  
@@ -277,7 +316,7 @@ function delIt() {
 */
 ?>
 <tr>
-	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Company');?>:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Entity');?>:</td>
 	<td>
 	<?php
 		$params = 'size="1" class="text" style="width:250px" ';
@@ -324,6 +363,21 @@ function delIt() {
 	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Description');?>* :</td>
 	<td align="left">
 		<textarea name="task_log_description" cols="60" rows="6" wrap="virtual" class="textarea"><?php echo (($tid > 0) ? $task["task_log_description"] : "");?></textarea>
+	</td>
+</tr>
+<tr>
+	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Cost Code');?>:</td>
+	<td align="left">
+		<?php
+			echo arraySelect( $task_log_costcodes, 'task_log_costcodes', 'size="1" class="text" onchange="javascript:task_log_costcode.value = this.options[this.selectedIndex].value;"', '' );
+		?>
+		&nbsp;->&nbsp;<input type="text" class="text" name="task_log_costcode" value="<?php echo $task["task_log_costcode"]//$log->task_log_costcode;?>" maxlength="8" size="8" />
+	</td>
+</tr>
+<tr>
+	<td align="right" valign="top" nowrap="nowrap"><?php echo $AppUI->_('Problem');?>:</td>
+	<td align="left">
+		<input type="checkbox" value="1" name="task_log_problem" <?php /*if($log->task_log_problem)*/if($task["task_log_problem"]){?>checked="checked"<?php }?> />
 	</td>
 </tr>
 <tr>

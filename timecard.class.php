@@ -1,4 +1,4 @@
-<?php /* HELPDESK $Id: timecard.class.php,v 1.3 2004/04/29 23:10:45 bloaterpaste Exp $ */
+<?php /* HELPDESK $Id: timecard.class.php,v 1.4 2004/05/12 22:52:08 bloaterpaste Exp $ */
 require_once( $AppUI->getSystemClass( 'dp' ) );
 //require_once( $AppUI->getSystemClass( 'libmail' ) );
 
@@ -7,9 +7,11 @@ require_once( $AppUI->getSystemClass( 'dp' ) );
 
 function getPermsWhereClause($mod, $mod_id_field){
 	GLOBAL $AppUI, $perms;
-
+	//print "<pre>";
+	//print_r($perms);
+	//print "</pre>";
   // Figure out the module and field
-	switch($mod){
+/*	switch($mod){
 		case "companies":
 			$id_field = "company_id";
 			break;
@@ -67,5 +69,7 @@ function getPermsWhereClause($mod, $mod_id_field){
 	$list = array_unique($list);
 
 	return " $mod_id_field in (".implode(",",$list).")";
+*/
+	return "1 = 1";	
 }
 ?>

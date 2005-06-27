@@ -1,4 +1,4 @@
-<?php /* HISTORY $Id: index.php,v 1.4 2004/05/13 18:17:05 bloaterpaste Exp $ */
+<?php /* HISTORY $Id: index.php,v 1.5 2004/05/20 19:14:35 bloaterpaste Exp $ */
 
 // check permissions
 $denyRead = getDenyRead( $m );
@@ -30,6 +30,8 @@ if($TIMECARD_CONFIG['integrate_with_helpdesk']){
 }
 if($TIMECARD_CONFIG['minimum_report_level']>=$AppUI->user_type){
 	$tabBox->add( 'vw_reports', 'Reports' );
+	$tabBox->add( 'vw_calendar_by_user', 'Time Card report' );
 }
+
 $tabBox->show();
 ?>

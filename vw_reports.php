@@ -16,7 +16,7 @@ $AppUI->savePlace();
 // get the prefered date format
 $df = $AppUI->getPref('SHDATEFORMAT');
 
-$reports = $AppUI->readFiles( dPgetConfig( 'root_dir' )."/modules/timecard/reports", "\.php$" );
+$reports = $AppUI->readFiles( $dPconfig['root_dir']."/modules/timecard/reports", "\.php$" );
 
 // setup the title block
 $titleBlock = new CTitleBlock( 'TimeCard Reports', '', $m, "$m.$a" );
@@ -29,14 +29,14 @@ $titleBlock->show();
 if ($report_type) {
 	$report_type = $AppUI->checkFileName( $report_type );
 	$report_type = str_replace( ' ', '_', $report_type );
-	require( dPgetConfig( 'root_dir' )."/modules/timecard/reports/$report_type.php" );
+	require( $dPconfig['root_dir']."/modules/timecard/reports/$report_type.php" );
 } else {
 	echo "<table>";
 	echo "<tr><td><h2>" . $AppUI->_( 'Reports Available' ) . "</h2></td></tr>";
 	foreach ($reports as $v) {
 		$type = str_replace( ".php", "", $v );
 		$desc_file = str_replace( ".php", ".$AppUI->user_locale.txt", $v );
-		$desc = @file( dPgetConfig( 'root_dir' )."/modules/timecard/reports/$desc_file" );
+		$desc = @file( $dPconfig['root_dir']."/modules/timecard/reports/$desc_file" );
 
 		echo "\n<tr>";
 		echo "\n	<td><a href=\"index.php?m=timecard&tab=$tab&report_type=$type\">";

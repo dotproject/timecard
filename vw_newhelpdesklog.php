@@ -274,7 +274,7 @@ function delIt() {
 */
 ?>
 <tr>
-	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Company');?>:</td>
+	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Entity');?>:</td>
 	<td>
 	<?php
 		$params = 'size="1" class="text" style="width:250px" ';

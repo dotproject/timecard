@@ -1,7 +1,6 @@
 <?php 
 
 	Global $TIMECARD_CONFIG;
-
 	$m = $AppUI->checkFileName(dPgetParam( $_GET, 'm', getReadableModule() ));
 	$denyEdit = getDenyEdit( $m );
 	if ($denyEdit) {
@@ -14,9 +13,11 @@
 	$show_other_worksheets = $TIMECARD_CONFIG['minimum_see_level']>=$AppUI->user_type;
 	$integrate_with_helpdesk = $TIMECARD_CONFIG['integrate_with_helpdesk'];
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
-//	print "<pre>";
-//	print_r($AppUI);
-//	print "</pre>";
+	//print "<pre>";
+	//print_r($AppUI);
+	//print "</pre>";
+	
+		
 	//compute hours/week from config
 	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
 	
@@ -24,7 +25,10 @@
 	$df = $AppUI->getPref('SHDATEFORMAT');
 
 	if (isset( $_GET['user_id'] )) {
+	//if (isset( $AppUI->user_id )) {
+	
 		$sql = "SELECT user_company FROM users WHERE user_id = ".$_GET['user_id'] ;
+		//print $sql;
 		$company_id = db_loadResult( $sql );
 		if(getDenyRead( "companies", $company_id )){
 			$AppUI->redirect( "m=public&a=access_denied" );
@@ -66,7 +70,8 @@
 	$next_date -> copy($start_day);
 	$next_date -> addDays(7);
 	
-	$is_my_timesheet = $user_id == $AppUI->user_id;
+	//***MOD 20050525 pedroa $is_my_timesheet = $user_id == $AppUI->user_id;
+	$is_my_timesheet = ($user_id == $AppUI->user_id || $can_edit_other_timesheets);
 	
 	?>
 	<form name="user_select" method="get">
@@ -88,10 +93,16 @@
 			<td align="right">
 					<select name="user_id" onChange="document.user_select.submit();">
 	<?php
-		$sql = "SELECT user_id, user_first_name, user_last_name FROM users WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
+		//$sql = "SELECT user_id, user_username, user_last_name FROM users WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
+		$sql = "SELECT users.user_contact,contacts.contact_first_name,contacts.contact_last_name,contacts.contact_id
+		FROM users
+		inner JOIN contacts on contact_id = user_contact
+		WHERE users.user_contact = ".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY contact_last_name, contact_first_name";
+		
+		 //WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
 		$result = db_loadList($sql);
 		foreach ($result as $user) {
-			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["user_last_name"].", ".$user["user_first_name"]."</option>\n";
+			echo "<option value=\"".$user["user_contact"]."\"".($user["user_contact"]==$user_id?"selected":"").">".$user["contact_last_name"].", ".$user["contact_first_name"]."</option>\n";
 		}
 	?>
 					</select>
@@ -144,7 +155,7 @@
 	$first=1;
 
 	for($dow=0;$dow<7;$dow++){
-		writeDayLine($last_day,$df,$AppUI->_('Add Task Log'),$is_my_timesheet);
+		writeDayLine($last_day,$df,$AppUI->_('Add Task Log'),$is_my_timesheet,$user_id);
 
 		foreach ($result as $task) {
 			$task_date = new CDate( $task["task_log_date"] );
@@ -201,7 +212,7 @@
 	</table>
 	</form>
 <?php
-function writeDayLine($day,$format,$task_string,$show_add){
+function writeDayLine($day,$format,$task_string,$show_add,$userid){
 	$day_name = $day->getDayName(false);
 	echo "<tr><td nowrap=\"nowrap\" valign=\"top\" colspan=\"".($show_add?"2":"3")."\"  style=\"background-color:#D7EAFF;\">";
 	echo "<div align=\"left\">";
@@ -210,7 +221,9 @@ function writeDayLine($day,$format,$task_string,$show_add){
 	echo "</td>";
 	if($show_add){
 		echo "<td nowrap=\"nowrap\" align=\"center\"  style=\"background-color:#D7EAFF;\">";
-		echo "<a href=\"?m=timecard&tab=1&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
+		//***MOD 20050525 pedroa echo "<a href=\"?m=timecard&tab=1&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
+		//***MOD 20050527 trimble echo "<a href=\"?m=timecard&tab=1&userid=".$_GET['user_id']."&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
+		echo "<a href=\"?m=timecard&tab=1&userid=".$userid."&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
 		echo "</td>";
 	}
 	echo "</tr>";

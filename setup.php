@@ -1,10 +1,10 @@
-<?php /* TIMECARD $Id: setup.php,v 1.2 2004/04/29 22:31:36 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: setup.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
 /*
 dotProject Module
 
 Name:      TimeCard
 Directory: timecard
-Version:   0.1
+Version:   2.0
 Class:     user
 UI Name:   TimeCard
 UI Icon:	TimeCard.png
@@ -16,7 +16,7 @@ If it is accessed directory it will give a summary of the module parameters.
 // MODULE CONFIGURATION DEFINITION
 $config = array();
 $config['mod_name'] = 'TimeCard';
-$config['mod_version'] = '0.2';
+$config['mod_version'] = '2.0';
 $config['mod_directory'] = 'timecard';
 $config['mod_setup_class'] = 'CSetupTimeCard';
 $config['mod_type'] = 'user';
@@ -29,8 +29,8 @@ if (@$a == 'setup') {
 	echo dPshowModuleConfig( $config );
 }
 
-require_once( $AppUI->cfg['root_dir'].'/modules/system/syskeys/syskeys.class.php' );
-
+//require_once( $AppUI->cfg['root_dir'].'/modules/system/syskeys/syskeys.class.php' );
+require_once( dPgetConfig( 'root_dir' ).'/modules/system/syskeys/syskeys.class.php' );
 /*
 // MODULE SETUP CLASS
 	This class must contain the following methods:

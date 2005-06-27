@@ -1,4 +1,4 @@
-<?php /* TASKS $Id: do_updatetasklog.php,v 1.2 2004/04/21 23:32:29 bloaterpaste Exp $ */
+<?php /* TASKS $Id: do_updatetasklog.php,v 1.3 2004/06/04 20:24:17 bloaterpaste Exp $ */
 
 //There is an issue with international UTF characters, when stored in the database an accented letter
 //actually takes up two letters per say in the field length, this is a problem with costcodes since
@@ -9,27 +9,27 @@ function cleanText($text){
 /*
 	//This text file is not utf, its iso so we have to decode/encode
 	$text = utf8_decode($text);
-	$trade = array('・=>'a','・=>'a','・=>'a',
-                 '・=>'a','・=>'a',
+	$trade = array('?E=>'a','?E=>'a','?E=>'a',
+                 '?E=>'a','?E=>'a',
                  'ﾁ'=>'A','ﾀ'=>'A','ﾃ'=>'A',
                  'ﾄ'=>'A','ﾂ'=>'A',
-                 '・=>'e','・=>'e',
-                 '・=>'e','・=>'e',
+                 '?E=>'e','?E=>'e',
+                 '?E=>'e','?E=>'e',
                  'ﾉ'=>'E','ﾈ'=>'E',
                  'ﾋ'=>'E','ﾊ'=>'E',
-                 '・=>'i','・=>'i',
-                 '・=>'i','・=>'i',
+                 '?E=>'i','?E=>'i',
+                 '?E=>'i','?E=>'i',
                  'ﾍ'=>'I','ﾌ'=>'I',
                  'ﾏ'=>'I','ﾎ'=>'I',
-                 '・=>'o','・=>'o','・=>'o',
-                 '・=>'o','・=>'o',
+                 '?E=>'o','?E=>'o','?E=>'o',
+                 '?E=>'o','?E=>'o',
                  'ﾓ'=>'O','ﾒ'=>'O','ﾕ'=>'O',
                  'ﾖ'=>'O','ﾔ'=>'O',
-                 '・=>'u','・=>'u',
-                 '・=>'u','・=>'u',
+                 '?E=>'u','?E=>'u',
+                 '?E=>'u','?E=>'u',
                  'ﾚ'=>'U','ﾙ'=>'U',
                  'ﾜ'=>'U','ﾛ'=>'U',
-                 'ﾑ'=>'N','・=>'n');
+                 'ﾑ'=>'N','?E=>'n');
     $text = strtr($text,$trade);
 	$text = utf8_encode($text);
 */

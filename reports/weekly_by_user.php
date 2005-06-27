@@ -4,9 +4,9 @@
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
 
 	//grab hours per day from config
-	$min_hours_day = $AppUI->cfg['daily_working_hours'];
+	$min_hours_day = $dPconfig['daily_working_hours'];
 	//compute hours/week from config
-	$min_hours_week =count(explode(",",dPgetConfig("cal_working_days"))) * $min_hours_day;
+	$min_hours_week =count(explode(",",$dPconfig["cal_working_days"])) * $min_hours_day;
 	// get date format
 	$df = $AppUI->getPref('SHDATEFORMAT');
 	
@@ -50,11 +50,12 @@
 	$sql = "
 		SELECT 
 			user_id,
-			concat(user_first_name,' ',user_last_name) as name,
-			user_email,
+			concat(contact_first_name,' ',contact_last_name) as name,
+			contact_email,
 			company_name
 		FROM 
 			users
+			LEFT JOIN contacts ON contacts.contact_id=users.user_contact
 			LEFT JOIN companies ON companies.company_id=users.user_company
 		WHERE 
 		".$where."
@@ -63,7 +64,7 @@
 		$sql .= " AND users.user_company = $company_id";
 	}
 	
-	$sql .= " ORDER BY user_last_name, user_first_name";
+	$sql .= " ORDER BY contact_first_name, contact_last_name";
 
 //	print "<pre>$sql</pre>";
 	$result = db_loadList($sql);
@@ -106,7 +107,6 @@
 		$start_data_pretty[$i] =  "$start_month $start_date-".($start_month==$end_month?$end_date:"$end_month $end_date");
 		$start_data_linkable[$i] =  urlencode($start_day->getDate()) ;
 //		$starts[$i] =  $start_day->format($df);
-
 		$sql = "
 			SELECT
 				task_log_creator,
@@ -114,9 +114,9 @@
 			FROM
 				task_log
 			WHERE
-				task_log_creator in (".implode(", ",$ids).")
-				AND task_log_date >= '".$start_day->format( FMT_DATETIME_MYSQL )."' 
+				task_log_date >= '".$start_day->format( FMT_DATETIME_MYSQL )."' 
 				AND task_log_date <= '".$end_day->format( FMT_DATETIME_MYSQL )."'
+				AND task_log_creator in (".implode(", ",$ids).")
 			GROUP BY
 				task_log_creator
 			";
@@ -134,7 +134,7 @@
 	}
 
 	$sql = "SELECT company_id, company_name FROM companies WHERE ".getPermsWhereClause("companies", "company_id")." ORDER BY company_name";
-	$companies = arrayMerge( array( 0 => $AppUI->_('All Companies') ), db_loadHashList( $sql ) );
+	$companies = arrayMerge( array( 0 => $AppUI->_('All Entities') ), db_loadHashList( $sql ) );
 
 	$next_day = new CDate ();
 	$next_day -> copy($start_day);
@@ -172,7 +172,7 @@
 ?>
 <tr>
 	<th><?=$AppUI->_('User')?></th>
-	<th><?=$AppUI->_('Company')?></th>
+	<th><?=$AppUI->_('Entity')?></th>
 <?php
 	if(isset($start_data_pretty))
 	for($i=$week_count-1;$i>=0;$i--){
