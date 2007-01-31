@@ -1,5 +1,5 @@
 <?php 
-	Global $tab,$TIMECARD_CONFIG;
+	global $tab,$TIMECARD_CONFIG;
 	
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
 
@@ -143,20 +143,20 @@
 <form name="frmCompanySelect" action="" method="get">
 	<input type="hidden" name="m" value="timecard">
 	<input type="hidden" name="report_type" value="weekly_by_user">
-	<input type="hidden" name="tab" value="<?=$tab?>">
+	<input type="hidden" name="tab" value="<?php echo $tab?>">
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
-		<td width="95%"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
+		<td width="95%"><?php echo arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmCompanySelect.submit()"',
                           $company_id )?></td>
                 <?php
                 	$prev_url = "?m=timecard&tab=$tab&report_type=weekly_by_user&start_date=".urlencode($start_day->getDate());
                 	$next_url = "?m=timecard&tab=$tab&report_type=weekly_by_user&start_date=".urlencode($next_day->getDate());
                 ?>
-		<td width="1%" nowrap="nowrap"><a href="<?=$prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-		<td width="1%" nowrap="nowrap"><a href="<?=$prev_url?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?php echo $prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?php echo $prev_url?>"><?php echo $AppUI->_('previous')?> <?php echo  $week_count?> <?php echo $AppUI->_('weeks')?></a></td>
 		<td width="1%" nowrap="nowrap">&nbsp;|&nbsp;</td>
-		<td width="1%" nowrap="nowrap"><a href="<?=$next_url?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-		<td width="1%" nowrap="nowrap"><a href="<?=$next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?php echo $next_url?>"><?php echo $AppUI->_('next')?> <?php echo  $week_count?> <?php echo $AppUI->_('weeks')?></a></td>
+		<td width="1%" nowrap="nowrap"><a href="<?php echo $next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 	</tr>
 	</table>
 
@@ -165,19 +165,19 @@
 <?php
 	if(!isset($people)){
 ?>
-	<tr><td align="center"><?=$AppUI->_('No Users Available')?></td></tr>
+	<tr><td align="center"><?php echo $AppUI->_('No Users Available')?></td></tr>
 <?php
 	} else {
 
 ?>
 <tr>
-	<th><?=$AppUI->_('User')?></th>
-	<th><?=$AppUI->_('Entity')?></th>
+	<th><?php echo $AppUI->_('User')?></th>
+	<th><?php echo $AppUI->_('Entity')?></th>
 <?php
 	if(isset($start_data_pretty))
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<th><?=$start_data_pretty[$i]?></th>
+	<th><?php echo $start_data_pretty[$i]?></th>
 <?php
 	}
 ?>
@@ -187,14 +187,14 @@
 	foreach($people as $id => $person){
 ?>
 <tr>
-	<td nowrap="nowrap"><?=$person['name']?></td>
-	<td nowrap="nowrap"><?=$person['company_name']?></td>
+	<td nowrap="nowrap"><?php echo $person['name']?></td>
+	<td nowrap="nowrap"><?php echo $person['company_name']?></td>
 <?php
 	for($i=$week_count-1;$i>=0;$i--){
 		 $hours = isset($person[$i])?$person[$i]:0;
 		 $hours = round($hours,2);
 ?>
-	<td <?=$show_possible_hours_worked&&$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><a href="?m=timecard&user_id=<?=$id?>&tab=0&start_date=<?=$start_data_linkable[$i]?>"><?=$hours?></a></td>
+	<td <?php echo $show_possible_hours_worked&&$hours<$min_hours_week?"bgcolor=\"#FFAEB8\"":""?>><a href="?m=timecard&user_id=<?php echo $id?>&tab=0&start_date=<?php echo $start_data_linkable[$i]?>"><?php echo $hours?></a></td>
 <?php
 	}
 ?>

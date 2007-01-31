@@ -1,5 +1,5 @@
 <?php 
-	Global $tab,$TIMECARD_CONFIG;
+	global $tab,$TIMECARD_CONFIG;
 	
 	$show_possible_hours_worked = $TIMECARD_CONFIG['show_possible_hours_worked'];
 
@@ -261,11 +261,11 @@ function setCalendar( idate, fdate ) {
 <form name="frmSelect" action="" method="get">
 	<input type="hidden" name="m" value="timecard">
 	<input type="hidden" name="report_type" value="weekly_by_project">
-	<input type="hidden" name="tab" value="<?=$tab?>">
+	<input type="hidden" name="tab" value="<?php echo $tab; ?>">
 	<table cellspacing="1" cellpadding="2" border="0" width="100%">
 	<tr>
-		<td width="1%" valign="top" nowrap="nowrap"><?=arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
-                          $company_id )?><?=arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
+		<td width="1%" valign="top" nowrap="nowrap"><?php echo arraySelect( $companies, 'company_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
+                          $company_id )?><?php echo arraySelect( $users, 'user_id', 'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"',
                           $user_id )?></td>
 		<td width="98%" align="right" valign="top">
 			<table cellpadding="0" cellspacing="0" width="1%">
@@ -275,11 +275,11 @@ function setCalendar( idate, fdate ) {
 						$next_url = "?m=timecard&tab=$tab&report_type=weekly_by_project&start_date=".urlencode($next_day->getDate())."&browse=1";
 					?>
 					<td width="95%">&nbsp;</td>
-					<td width="1%"><a href="<?=$prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
-					<td width="1%" nowrap="nowrap" style="padding-left:5px"><a href="<?=$prev_url?>"><?=$AppUI->_('previous')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
+					<td width="1%"><a href="<?php echo $prev_url?>"><img src="./images/prev.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'previous' );?>" border="0"></a></td>
+					<td width="1%" nowrap="nowrap" style="padding-left:5px"><a href="<?php echo $prev_url?>"><?php echo $AppUI->_('previous')?> <?php echo  $week_count?> <?php echo $AppUI->_('weeks')?></a></td>
 					<td width="1%">&nbsp;|&nbsp;</td>
-					<td width="1%" nowrap="nowrap" style="padding-right:5px"><a href="<?=$next_url?>"><?=$AppUI->_('next')?> <?= $week_count?> <?=$AppUI->_('weeks')?></a></td>
-					<td width="1%"><a href="<?=$next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
+					<td width="1%" nowrap="nowrap" style="padding-right:5px"><a href="<?php echo $next_url?>"><?php echo $AppUI->_('next')?> <?php echo  $week_count?> <?php echo $AppUI->_('weeks')?></a></td>
+					<td width="1%"><a href="<?php echo $next_url?>"><img src="./images/next.gif" width="16" height="16" alt="<?php echo $AppUI->_( 'next' );?>" border="0"></a></td>
 				</tr>
 			</table>
 		</td>
@@ -289,24 +289,24 @@ function setCalendar( idate, fdate ) {
 			
 			<table cellpadding="0" cellspacing="0" width="100%">
 				<tr>
-					<td width="97%"><?=arraySelect($report_department_types, 'report_department_type',  'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $report_department_type)?></td>
+					<td width="97%"><?php echo arraySelect($report_department_types, 'report_department_type',  'size="1" class="text" id="medium" onchange="document.frmSelect.submit()"', $report_department_type)?></td>
 					<td nowrap="nowrap" width="1%">
 						<input type="hidden" name="browse" value="0" />
-						<input type="hidden" name="start_date" value="<?=$start_day->format( FMT_TIMESTAMP_DATE );?>" />
-						<input type="text" name="start" value="<?=$start_day->format( $df );?>" class="text" disabled="disabled" />
+						<input type="hidden" name="start_date" value="<?php echo $start_day->format( FMT_TIMESTAMP_DATE );?>" />
+						<input type="text" name="start" value="<?php echo $start_day->format( $df );?>" class="text" disabled="disabled" />
 						<a href="#" onClick="popCalendar('start')">
-							<img src="./images/calendar.gif" width="24" height="12" alt="<?=$AppUI->_('Calendar');?>" border="0" />
+							<img src="./images/calendar.gif" width="24" height="12" alt="<?php echo $AppUI->_('Calendar');?>" border="0" />
 						</a>
 					</td>
 					<td nowrap="nowrap" width="1%">
-						<input type="hidden" name="end_date" value="<?=$end_day ? $end_day->format( FMT_TIMESTAMP_DATE ) : '';?>" />
-						<input type="text" name="end" value="<?=$end_day ? $end_day->format( $df ) : '';?>" class="text" disabled="disabled" />
+						<input type="hidden" name="end_date" value="<?php echo $end_day ? $end_day->format( FMT_TIMESTAMP_DATE ) : '';?>" />
+						<input type="text" name="end" value="<?php echo $end_day ? $end_day->format( $df ) : '';?>" class="text" disabled="disabled" />
 						<a href="#" onClick="popCalendar('end')">
-							<img src="./images/calendar.gif" width="24" height="12" alt="<?=$AppUI->_('Calendar');?>" border="0" />
+							<img src="./images/calendar.gif" width="24" height="12" alt="<?php echo $AppUI->_('Calendar');?>" border="0" />
 						</a>
 					</td>
 					<td width="1%">
-						<input type="submit" value="<?=$AppUI->_('Report on Date Range')?>">
+						<input type="submit" value="<?php echo $AppUI->_('Report on Date Range')?>">
 					</td>
 				</tr>
 			</table>
@@ -317,12 +317,12 @@ function setCalendar( idate, fdate ) {
 </form>
 <table cellspacing="1" cellpadding="2" border="0" class="std" width="100%">
 <tr>
-	<th><?=$AppUI->_('Project/UserName')?></th>
+	<th><?php echo $AppUI->_('Project/UserName')?></th>
 <?php
 	if(isset($start_data_pretty))
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<th><?=$start_data_pretty[$i]?></th>
+	<th><?php echo $start_data_pretty[$i]?></th>
 <?php
 	}
 ?>
@@ -330,7 +330,7 @@ function setCalendar( idate, fdate ) {
 <?php
 	if(!isset($projects)){
 ?>
-	<tr><td align="center" colspan="<?=($week_count+1)?>"><?=$AppUI->_('No Data Available')?></td></tr>
+	<tr><td align="center" colspan="<?php echo ($week_count+1)?>"><?php echo $AppUI->_('No Data Available')?></td></tr>
 <?php
 	} else {
 		$image_straight = '<img src="./modules/timecard/images/verticle-dots.png" width="16" height="12" border="0">';
@@ -348,11 +348,11 @@ function setCalendar( idate, fdate ) {
 		}
 ?>
 <tr>
-	<td style="background:#8AC6FF;"><?=$id?></td>
+	<td style="background:#8AC6FF;"><?php echo $id?></td>
 <?php
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<td style="background:#8AC6FF;"><?=isset($company['totals'][$i])?round($company['totals'][$i],2):"0"?></td>
+	<td style="background:#8AC6FF;"><?php echo isset($company['totals'][$i])?round($company['totals'][$i],2):"0"?></td>
 <?php
 	}
 ?>
@@ -367,11 +367,11 @@ function setCalendar( idate, fdate ) {
 		}
 ?>
 <tr>
-	<td style="background:#A7D4FF;"><?=$image_elbow?><?=$id?></td>
+	<td style="background:#A7D4FF;"><?php echo $image_elbow?><?php echo $id?></td>
 <?php
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<td style="background:#A7D4FF;"><?=isset($department['totals'][$i])?round($department['totals'][$i],2):"0"?></td>
+	<td style="background:#A7D4FF;"><?php echo isset($department['totals'][$i])?round($department['totals'][$i],2):"0"?></td>
 <?php
 	}
 ?>
@@ -390,11 +390,11 @@ function setCalendar( idate, fdate ) {
 	if(isset($project['totals'])){
 ?>
 <tr>
-	<td nowrap="nowrap" style="background:#C0E0FF;"><?=!$last_department?$image_straight:$image_shim?><?=$image_elbow?><a href="?m=projects&a=view&project_id=<?=$id?>"><?=$project['project_name']?></a></td>
+	<td nowrap="nowrap" style="background:#C0E0FF;"><?php echo !$last_department?$image_straight:$image_shim?><?php echo $image_elbow?><a href="?m=projects&a=view&project_id=<?php echo $id?>"><?php echo $project['project_name']?></a></td>
 <?php
 	for($i=$week_count-1;$i>=0;$i--){
 ?>
-	<td style="background:#C0E0FF;"><?=isset($project['totals'][$i])?round($project['totals'][$i],2):"0"?></td>
+	<td style="background:#C0E0FF;"><?php echo isset($project['totals'][$i])?round($project['totals'][$i],2):"0"?></td>
 <?php
 	}
 ?>
@@ -404,13 +404,13 @@ function setCalendar( idate, fdate ) {
 		foreach($project['users'] as $id => $person){
 ?>
 <tr>
-	<td><?=!$last_department?$image_straight:$image_shim?><?=!$last_project?$image_straight:$image_shim?><?=$image_elbow?><?=isset($people[$id]['name'])?$people[$id]['name']:$id?></td>
+	<td><?php echo !$last_department?$image_straight:$image_shim?><?php echo !$last_project?$image_straight:$image_shim?><?php echo $image_elbow?><?php echo isset($people[$id]['name'])?$people[$id]['name']:$id?></td>
 <?php
 			for($i=$week_count-1;$i>=0;$i--){
 				 $hours = isset($person[$i])?$person[$i]:0;
 				 $hours = round($hours,2);
 ?>
-	<td><a href="?m=timecard&user_id=<?=$id?>&tab=0&start_date=<?=$start_data_linkable[$i]?>"><?=$hours?></a></td>
+	<td><a href="?m=timecard&user_id=<?php echo $id?>&tab=0&start_date=<?php echo $start_data_linkable[$i]?>"><?php echo $hours?></a></td>
 <?php
 			}
 ?>
