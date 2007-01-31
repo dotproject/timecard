@@ -118,15 +118,15 @@ $titleBlock->show();
 foreach ($config_options as $key=>$value){
 ?>
 	<tr>
-		<td align="left"><?=$value['description']?></td>
+		<td align="left"><?php echo $value['description']; ?></td>
 		<td><?php
 		switch($value['type']){
 			case 'checkbox': ?>
-				<input type="checkbox" name="<?=$key?>" <?=$value['value']?"checked=\"checked\"":""?>>
+				<input type="checkbox" name="<?php echo $key; ?>" <?php echo $value['value'] ? "checked=\"checked\"" : ""; ?> />
 				<?php
 				break;
 			case 'text': ?>
-				<input type="text" name="<?=$key?>" value="<?=$value['value']?>">
+				<input type="text" name="<?php echo $key; ?>" value="<?php echo $value['value']; ?>" />
 				<?php
 				break;
 			case 'select': 
@@ -141,7 +141,7 @@ foreach ($config_options as $key=>$value){
 }
 ?>
 	<tr>
-		<td colspan="2" align="right"><input type="Submit" name="Cancel" value="<?=$AppUI->_('Back')?>"><input type="Submit" name="Save" value="<?=$AppUI->_('Save')?>"></td>
+		<td colspan="2" align="right"><input type="Submit" name="Cancel" value="<?php echo $AppUI->_('Back'); ?>"><input type="Submit" name="Save" value="<?php echo $AppUI->_('Save'); ?>"></td>
 	</tr>
 </table>
 </form>
