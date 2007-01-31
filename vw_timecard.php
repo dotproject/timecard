@@ -169,20 +169,20 @@
 				<tr>
 					<td nowrap="nowrap" valign="top">
 					<?php if($task['task_id']){ ?>
-						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"];?>"><?=$task["task_log_name"]?></a>
+						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"]; ?>"><?php echo $task["task_log_name"]; ?></a>
 					<?php } else if(isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']){ ?>
-						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?=$task["task_log_name"]?></a>
+						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?php echo $task["task_log_name"]; ?></a>
 					<?php } else { ?>
-						<?=$task["task_log_name"]?>
+						<?php echo $task["task_log_name"]; ?>
 					<?php } ?>
 					</td>
 					<td>
 					<?php if($task['task_log_creator']==$AppUI->user_id || $can_edit_other_timesheets){ 
 						if(!isset($task['task_log_help_desk_id']) || (isset($task['task_log_help_desk_id']) && !$task['task_log_help_desk_id']) || $integrate_with_helpdesk){
 					?>
-						<a href="?m=timecard&tab=<?=isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']?2:1?>&tid=<?=$task["task_log_id"]?>">[<?=$AppUI->_('Edit')?>]<?php ?></a>
+						<a href="?m=timecard&tab=<?php echo isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id'] ? 2 : 1;?>&tid=<?php echo $task["task_log_id"]; ?>">[<?php echo $AppUI->_('Edit'); ?>]</a>
 					<?php }
-						} ?> 
+						} ?>
 					<?php echo $task["task_log_description"]; ?></td>
 					<td align="right" valign="top"><?php echo $task["task_log_hours"]; ?></td>
 				</tr>
@@ -203,7 +203,7 @@
 
 	echo "<tr><th nowrap=\"nowrap\" valign=\"top\" colspan=\"4\" ><div align=\"left\"><b>".$AppUI->_('For the week of')." ".$start_day -> getDayName(false). " " .$start_day->format( $df )." ".$AppUI->_('through')." ".$end_day -> getDayName(false). " " .$end_day->format( $df )."</b></div></th></tr>";;
 	echo "<tr><td colspan=\"2\" align=\"right\"><b>".$AppUI->_('Total Hours')."</b></td><td align=\"right\">";
-	if($show_possible_hours_worked && $total_hours_weekly<$min_hours_week){
+	if ($show_possible_hours_worked && $total_hours_weekly<$min_hours_week) {
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($min_hours_week-$total_hours_weekly)."</span></b>";
 	}
 	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours_weekly."</span></b>";
@@ -212,7 +212,8 @@
 	</table>
 	</form>
 <?php
-function writeDayLine($day,$format,$task_string,$show_add,$userid){
+function writeDayLine($day,$format,$task_string,$show_add,$userid)
+{
 	$day_name = $day->getDayName(false);
 	echo "<tr><td nowrap=\"nowrap\" valign=\"top\" colspan=\"".($show_add?"2":"3")."\"  style=\"background-color:#D7EAFF;\">";
 	echo "<div align=\"left\">";
@@ -229,7 +230,8 @@ function writeDayLine($day,$format,$task_string,$show_add,$userid){
 	echo "</tr>";
 }
 
-function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day, $show_possible_hours_worked){
+function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day, $show_possible_hours_worked)
+{
 	echo "<tr><td colspan=\"2\" align=\"right\"><b>".$total_string."</b></td>";
 	echo "<td align=\"right\" >";
 	if($show_possible_hours_worked && $total_hours<$hours_per_day && $workday){

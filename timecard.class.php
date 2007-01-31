@@ -1,12 +1,13 @@
-<?php /* HELPDESK $Id: timecard.class.php,v 1.4 2004/05/12 22:52:08 bloaterpaste Exp $ */
-require_once( $AppUI->getSystemClass( 'dp' ) );
-//require_once( $AppUI->getSystemClass( 'libmail' ) );
+<?php /* HELPDESK $Id: timecard.class.php,v 1.5 2005/06/27 21:17:53 hstanton Exp $ */
+require_once $AppUI->getSystemClass('dp');
+//require_once $AppUI->getSystemClass('libmail');
 
 // Function to build a where clause to be appended to any sql that will narrow
 // down the returned data to only permitted entities
 
-function getPermsWhereClause($mod, $mod_id_field){
-	GLOBAL $AppUI, $perms;
+function getPermsWhereClause($mod, $mod_id_field)
+{
+	global $AppUI, $perms;
 	//print "<pre>";
 	//print_r($perms);
 	//print "</pre>";

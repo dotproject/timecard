@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: setup.php,v 1.3 2004/05/12 22:52:08 bloaterpaste Exp $ */
+<?php /* TIMECARD $Id: setup.php,v 1.4 2005/06/27 21:17:53 hstanton Exp $ */
 /*
 dotProject Module
 
@@ -29,8 +29,8 @@ if (@$a == 'setup') {
 	echo dPshowModuleConfig( $config );
 }
 
-//require_once( $AppUI->cfg['root_dir'].'/modules/system/syskeys/syskeys.class.php' );
-require_once( dPgetConfig( 'root_dir' ).'/modules/system/syskeys/syskeys.class.php' );
+//require_once $AppUI->cfg['root_dir'].'/modules/system/syskeys/syskeys.class.php';
+require_once dPgetConfig( 'root_dir' ).'/modules/system/syskeys/syskeys.class.php';
 /*
 // MODULE SETUP CLASS
 	This class must contain the following methods:
@@ -38,27 +38,32 @@ require_once( dPgetConfig( 'root_dir' ).'/modules/system/syskeys/syskeys.class.p
 	remove - drop the appropriate db tables
 	upgrade - upgrades tables from previous versions
 */
-class CSetupTimeCard {
+class CSetupTimeCard
+{
 /*
 	Install routine
 */
-	function install() {
+	function install()
+	{
 		return true;
 	}
 /*
 	Removal routine
 */
-	function remove() {
+	function remove()
+	{
 		return true;
 	}
 /*
 	Upgrade routine
 */
-	function upgrade() {
+	function upgrade()
+	{
 		return true;
 	}
 
-	function configure() {
+	function configure()
+	{
 		global $AppUI;
 		$AppUI->redirect("m=timecard&a=configure");
 		return true;

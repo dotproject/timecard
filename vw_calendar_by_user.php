@@ -1,4 +1,4 @@
-<?php /* PROJECTS $Id: tasklogs.php,v 1.4 2004/01/14 03:11:59 dylan_cuthbert Exp $ */
+<?php /* PROJECTS $Id: vw_calendar_by_user.php,v 1.1 2005/08/21 15:45:43 pedroix Exp $ */
 /**
 * Modified and adapted by Jonathan Dumaresq on 2005/03/08
 * Generates a report of the task logs for given dates for the logged user
@@ -34,7 +34,8 @@ if (!$log_start_date) {
 $end_date->setTime( 23, 59, 59 );
 
 ?>
-<script language="javascript">
+<script language="javascript" type="text/javascript">
+<!--
 var calendarField = '';
 
 function popCalendar( field ){
@@ -53,6 +54,7 @@ function setCalendar( idate, fdate ) {
 	fld_date.value = idate;
 	fld_fdate.value = fdate;
 }
+// -->
 </script>
 
 <table cellspacing="0" cellpadding="4" border="0" width="100%" class="std">
