@@ -1,4 +1,4 @@
-<?php /* TIMECARD $Id: setup.php,v 1.4 2005/06/27 21:17:53 hstanton Exp $ */
+<?php /* TIMECARD $Id: setup.php,v 1.5 2007/01/31 16:02:50 theideaman Exp $ */
 /*
 dotProject Module
 
@@ -29,7 +29,6 @@ if (@$a == 'setup') {
 	echo dPshowModuleConfig( $config );
 }
 
-//require_once $AppUI->cfg['root_dir'].'/modules/system/syskeys/syskeys.class.php';
 require_once dPgetConfig( 'root_dir' ).'/modules/system/syskeys/syskeys.class.php';
 /*
 // MODULE SETUP CLASS

@@ -2,6 +2,6 @@
 $TIMECARD_CONFIG['minimum_report_level'] = '6';
 $TIMECARD_CONFIG['minimum_see_level'] = '6';
 $TIMECARD_CONFIG['minimum_edit_level'] = '6';
-$TIMECARD_CONFIG['integrate_with_helpdesk'] = '1';
+$TIMECARD_CONFIG['integrate_with_helpdesk'] = '0';
 $TIMECARD_CONFIG['show_possible_hours_worked'] = '1';
 ?> 
