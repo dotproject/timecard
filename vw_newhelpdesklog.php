@@ -1,4 +1,5 @@
-<?php
+<?php /* HELPDESK $Id: vw_newhelpdesklog.php,v 1.1 2007/08/22 1:21 PM arcos Exp $ */
+//THIS TAB IS NOT CURRENTLY FUNCTIONAL for current CVS of HelpDesk (as of 1:31 PM 2007-08-22)
 
 //Based largely on the page with the same funtion in the existing TimeTrack module by ajdonnison.  
 
@@ -24,8 +25,8 @@ LEFT JOIN helpdesk_items ON task_log_help_desk_id = item_id
 WHERE  task_log_id = $tid 
 AND ".getItemPerms()."
 "; 
-//echo "<pre>$sql</pre>";
-//echo '<pre>';print_r($sql);echo '</pre>';
+echo "<pre>$sql</pre>";
+echo '<pre>';print_r($sql);echo '</pre>';
 
 db_loadHash( $sql, $helpdeskItemTask );
 

@@ -1,4 +1,4 @@
-<?php
+<?php /* HELPDESK $Id: vw_newlog.php,v 1.1 2007/08/22 1:21 PM arcos Exp $ */
 
 //Based largely on the page with the same funtion in the existing TimeTrack module by ajdonnison.  
 

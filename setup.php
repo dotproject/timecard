@@ -1,22 +1,22 @@
-<?php /* TIMECARD $Id: setup.php,v 1.5 2007/01/31 16:02:50 theideaman Exp $ */
+<?php /* HELPDESK $Id: setup.php,v 1.6.1 2007/08/22 1:21 PM arcos Exp $ */
 /*
 dotProject Module
 
 Name:      TimeCard
 Directory: timecard
-Version:   2.0
+Version:   2.1
 Class:     user
 UI Name:   TimeCard
 UI Icon:	TimeCard.png
 
 This file does no action in itself.
-If it is accessed directory it will give a summary of the module parameters.
+If it is accessed directly it will give a summary of the module parameters.
 */
 
 // MODULE CONFIGURATION DEFINITION
 $config = array();
 $config['mod_name'] = 'TimeCard';
-$config['mod_version'] = '2.0';
+$config['mod_version'] = '2.1';
 $config['mod_directory'] = 'timecard';
 $config['mod_setup_class'] = 'CSetupTimeCard';
 $config['mod_type'] = 'user';

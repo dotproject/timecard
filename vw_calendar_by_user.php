@@ -1,11 +1,12 @@
-<?php /* PROJECTS $Id: vw_calendar_by_user.php,v 1.1 2005/08/21 15:45:43 pedroix Exp $ */
+<?php /* HELPDESK $Id: vw_calendar_by_user.php,v 1.3 2007/08/22 1:21 PM arcos Exp $ */
 /**
 * Modified and adapted by Jonathan Dumaresq on 2005/03/08
+* Modified by Matthew Arciniega on 2007/08/03
 * Generates a report of the task logs for given dates for the logged user
 */
+//print $tab;
 error_reporting( E_ALL );
-
-$do_report = dPgetParam( $_POST, "do_report", 0 );
+$do_report = dPgetParam( $_POST, "do_report", 1 );
 $log_pdf = dPgetParam( $_POST, 'log_pdf', 0 );
 $log_start_date = dPgetParam( $_POST, "log_start_date", 0 );
 $log_end_date = dPgetParam( $_POST, "log_end_date", 0 );
@@ -15,7 +16,11 @@ $end_date = intval( $log_end_date ) ? new CDate( $log_end_date ) : new CDate();
 
 $df = $AppUI->getPref('SHDATEFORMAT');
 if (isset( $_GET['user_id'] )) {
-	$sql = "SELECT user_company FROM users WHERE user_id = ".$_GET['user_id'] ;
+	$sql = "SELECT user_contact FROM users WHERE user_id = ".$_GET['user_id'] ;
+  $user_contact = db_loadresult( $sql );
+	$sql = "SELECT contact_company FROM contacts WHERE contact_id = ".$user_contact ;
+	//print "<pre>$sql</pre>";
+
 	$company_id = db_loadResult( $sql );
 	if(getDenyRead( "companies", $company_id )){
 		$AppUI->redirect( "m=public&a=access_denied" );
@@ -59,9 +64,7 @@ function setCalendar( idate, fdate ) {
 
 <table cellspacing="0" cellpadding="4" border="0" width="100%" class="std">
 
-<form name="editFrm" action="index.php?m=timecard&tab=4" method="post">
-<input type="hidden" name="project_id" value="<?php echo $project_id;?>" />
-<input type="hidden" name="report_type" value="<?php echo $report_type;?>" />
+<form name="editFrm" action="index.php?m=timecard" method="post">
 
 <tr>
 	<td align="right" nowrap="nowrap"><?php echo $AppUI->_('For period');?>:</td>
@@ -95,20 +98,17 @@ function setCalendar( idate, fdate ) {
 <?php
 if ($do_report) {
 
-	$sql = "SELECT task_log.*, tasks.task_id, projects.project_name, users.user_id, contacts.contact_first_name, contacts.contact_last_name
-		FROM 
-			task_log 
-			LEFT JOIN tasks on task_log.task_log_task = tasks.task_id
-			LEFT JOIN projects on projects.project_name = project_name
-			INNER JOIN users on user_contact = contact_id 
-			LEFT JOIN contacts on contacts.contact_first_name = contact_first_name
-		WHERE " 
-		."contacts.contact_id = ".$user_id." AND "
-		." tasks.task_project= projects.project_id AND"
-		." task_log_creator=".$user_id." AND"
-		." task_log_date >= '".$start_date->format( FMT_DATETIME_MYSQL )."' AND"
-		." task_log_date <= '".$end_date->format( FMT_DATETIME_MYSQL )."'"
-		." ORDER BY task_log_date";
+	$sql = "SELECT task_log.*, tasks.task_id,tasks.task_name, projects.project_name
+		FROM
+			task_log, tasks, projects
+		WHERE
+			task_log.task_log_task = tasks.task_id AND
+			task_log.task_log_creator =".$user_id." AND
+			tasks.task_project = projects.project_id AND
+			task_log.task_log_date >=
+			'".$start_date->format( FMT_DATETIME_MYSQL )."' AND
+			task_log.task_log_date <= '".$end_date->format(FMT_DATETIME_MYSQL )."'
+		ORDER BY task_log_date";
 	//print "<pre>$sql</pre>";
 
 	$logs = db_loadList( $sql );
@@ -119,8 +119,8 @@ if ($do_report) {
 		<th width="10%" nowrap="nowrap">
 		<?php echo $AppUI->_('Date');?></th>
 		<th width="7%"><?php echo $AppUI->_('Project');?></th>
-		<th width="11%"><?php echo $AppUI->_('Task');?></th>
-		<th width="70%"><?php echo $AppUI->_('Description');?></th>
+		<th width="21%"><?php echo $AppUI->_('Task & Log Title');?></th>
+		<th width="60%"><?php echo $AppUI->_('Description');?></th>
 		<th width="2%"><?php echo $AppUI->_('Hours');?></th>
 	</tr>
 	
@@ -130,7 +130,7 @@ if ($do_report) {
 	$pdfdata[] = array(
 		$AppUI->_('Date'),
 		$AppUI->_('Project'),
-		$AppUI->_('Task'),
+		$AppUI->_('Task & Log Title'),
 		$AppUI->_('Description'),
 		$AppUI->_('Hours')
 	);
@@ -142,11 +142,17 @@ if ($do_report) {
 		$pdfdata[] = array(
 			$date->format( $df ),
 			$log['project_name'],
-			$log['task_log_name'],
+			$log['task_name'],
+		  $log['task_log_name'],
 			$log['task_log_description'],
 			sprintf( "%.2f", $log['task_log_hours'] )
 		);
-
+		
+		if ($log['task_name'] == $log['task_log_name']) {
+		  $taskTitle = $log['task_name'];
+		} else {
+		  $taskTitle = $log['task_name'].": ".$log['task_log_name'];
+    }
 			?>
 			<tr>
 				<td nowrap="nowrap" valign="top">
@@ -155,10 +161,10 @@ if ($do_report) {
 				<td nowrap="nowrap" valign="top">
 				<?php echo $log['project_name'];?>
 				</td>
-				<td nowrap="nowrap" valign="top">
-				<?php echo $log['task_log_name'];?>
+				<td valign="top">
+				<?php echo $taskTitle;?>
 				</td>
-				<td nowrap="nowrap" valign="top">
+				<td valign="top">
 				<?php echo $log['task_log_description'];?>
 				</td>
 				<td nowrap="nowrap" valign="top">
@@ -188,18 +194,21 @@ if ($do_report) {
 <?php
 	if ($log_pdf) {
 	// make the PDF file
-		/*$sql = "SELECT project_name FROM projects WHERE project_id=$project_id";
-		$pname = db_loadResult( $sql );
-		echo db_error();*/
-		$pname = "For user: ".$log['contact_first_name']." ".$log['contact_last_name'];
-		
+		$sql = "SELECT user_contact FROM users WHERE user_id = ".$user_id ;
+    $user_contact = db_loadresult( $sql );
+	  $sql = "SELECT contacts.contact_first_name FROM contacts WHERE contact_id = ".$user_contact ;
+    $firstName = db_loadresult( $sql );
+	  $sql = "SELECT contacts.contact_last_name FROM contacts WHERE contact_id = ".$user_contact ;
+    $lastName = db_loadresult( $sql );
+		$pname = "For user: ".$firstName." ".$lastName;
+
 		$font_dir = $dPconfig['root_dir']."/lib/ezpdf/fonts";
 		$temp_dir = $dPconfig['root_dir']."/files/temp";
 		$base_url  = $dPconfig['base_url'];
 		require( $AppUI->getLibraryClass( 'ezpdf/class.ezpdf' ) );
 
 		$pdf =& new Cezpdf();
-		$pdf->ezSetCmMargins( 1, 2, 1.5, 1.5 );
+		$pdf->ezSetCmMargins( 1, 1.5, 1.0, 1.0 );
 		$pdf->selectFont( "$font_dir/Helvetica.afm" );
 
 		$pdf->ezText( $dPconfig['company_name'], 12 );
@@ -218,7 +227,7 @@ if ($do_report) {
 		$options = array(
 			'showLines' => 1,
 			'showHeadings' => 0,
-			'fontSize' => 8,
+			'fontSize' => 7,
 			'rowGap' => 2,
 			'colGap' => 5,
 			'xPos' => 50,

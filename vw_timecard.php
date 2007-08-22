@@ -1,6 +1,7 @@
-<?php 
+<?php /* HELPDESK $Id: vw_timecard.php,v 1.7.1 2007/08/22 1:21 PM arcos Exp $ */
 
-	Global $TIMECARD_CONFIG;
+	Global $TIMECARD_CONFIG,$newTLogTabNum;
+	
 	$m = $AppUI->checkFileName(dPgetParam( $_GET, 'm', getReadableModule() ));
 	$denyEdit = getDenyEdit( $m );
 	if ($denyEdit) {
@@ -27,12 +28,17 @@
 	if (isset( $_GET['user_id'] )) {
 	//if (isset( $AppUI->user_id )) {
 	
-		$sql = "SELECT user_company FROM users WHERE user_id = ".$_GET['user_id'] ;
+		$sql = "SELECT user_contact FROM users WHERE user_id = ".$_GET['user_id'];
+		$contact_id = db_loadResult( $sql );
+		$sql = "SELECT contact_company FROM contacts WHERE contact_id = ".$contact_id;
 		//print $sql;
 		$company_id = db_loadResult( $sql );
-		if(getDenyRead( "companies", $company_id )){
-			$AppUI->redirect( "m=public&a=access_denied" );
-		}
+		//print $company_id.":".getDenyRead( "companies", $company_id );
+		//Comment out the 3 lines below to skip the company check
+    if(getDenyRead( "companies", $company_id )){
+    $AppUI->redirect( "m=public&a=access_denied" );
+    }
+    
 		$AppUI->setState( 'TimecardSelectedUser', $_GET['user_id'] );
 	}
 	$user_id = $AppUI->getState( 'TimecardSelectedUser' ) ? $AppUI->getState( 'TimecardSelectedUser' ) : $AppUI->user_id;
@@ -70,7 +76,8 @@
 	$next_date -> copy($start_day);
 	$next_date -> addDays(7);
 	
-	//***MOD 20050525 pedroa $is_my_timesheet = $user_id == $AppUI->user_id;
+	//***MOD 20050525 pedroa 
+	//$is_my_timesheet = $user_id == $AppUI->user_id;
 	$is_my_timesheet = ($user_id == $AppUI->user_id || $can_edit_other_timesheets);
 	
 	?>
@@ -93,16 +100,16 @@
 			<td align="right">
 					<select name="user_id" onChange="document.user_select.submit();">
 	<?php
-		//$sql = "SELECT user_id, user_username, user_last_name FROM users WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
-		$sql = "SELECT users.user_contact,contacts.contact_first_name,contacts.contact_last_name,contacts.contact_id
+		//$sql = "SELECT user_id, user_username, user_last_name 
+		//FROM users WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
+		$sql = "SELECT users.user_contact,users.user_id,contacts.contact_first_name,contacts.contact_last_name,contacts.contact_id
 		FROM users
 		inner JOIN contacts on contact_id = user_contact
-		WHERE users.user_contact = ".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY contact_last_name, contact_first_name";
+		WHERE users.user_contact = ".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY contact_first_name, contact_last_name";
 		
-		 //WHERE user_id=".$AppUI->user_id." or (".getPermsWhereClause("companies", "user_company").") ORDER BY user_last_name, user_first_name";
 		$result = db_loadList($sql);
 		foreach ($result as $user) {
-			echo "<option value=\"".$user["user_contact"]."\"".($user["user_contact"]==$user_id?"selected":"").">".$user["contact_last_name"].", ".$user["contact_first_name"]."</option>\n";
+			echo "<option value=\"".$user["user_id"]."\"".($user["user_id"]==$user_id?"selected":"").">".$user["contact_first_name"]." ".$user["contact_last_name"]."</option>\n";
 		}
 	?>
 					</select>
@@ -130,8 +137,8 @@
 	$start_day -> setDate($date, DATE_FORMAT_ISO);
 	$date = $end_day->format("%Y-%m-%d")." 23:59:59";
 	$end_day -> setDate($date, DATE_FORMAT_ISO);
-
-	$sql = "SELECT task_log.*, tasks.task_id 
+  //12:23 AM 2007-08-06 Query modified to use task name rather than task summary
+	$sql = "SELECT task_log.*, tasks.task_id, tasks.task_name
 		FROM 
 			task_log 
 			LEFT JOIN tasks on task_log.task_log_task = tasks.task_id
@@ -155,7 +162,7 @@
 	$first=1;
 
 	for($dow=0;$dow<7;$dow++){
-		writeDayLine($last_day,$df,$AppUI->_('Add Task Log'),$is_my_timesheet,$user_id);
+		writeDayLine($last_day,$df,$AppUI->_('Add Task Log'),$is_my_timesheet,$user_id,$newTLogTabNum);
 
 		foreach ($result as $task) {
 			$task_date = new CDate( $task["task_log_date"] );
@@ -169,9 +176,9 @@
 				<tr>
 					<td nowrap="nowrap" valign="top">
 					<?php if($task['task_id']){ ?>
-						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"]; ?>"><?php echo $task["task_log_name"]; ?></a>
+						<a href="?m=tasks&a=view&task_id=<?php echo $task["task_id"]; ?>"><?php echo $task["task_name"]; ?></a>
 					<?php } else if(isset($task['task_log_help_desk_id'])&&$task['task_log_help_desk_id']){ ?>
-						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?php echo $task["task_log_name"]; ?></a>
+						<a href="?m=helpdesk&a=view&item_id=<?php echo $task["task_log_help_desk_id"];?>"><?php echo $task["task_name"]; ?></a>
 					<?php } else { ?>
 						<?php echo $task["task_log_name"]; ?>
 					<?php } ?>
@@ -180,11 +187,11 @@
 					<?php if($task['task_log_creator']==$AppUI->user_id || $can_edit_other_timesheets){ 
 						if(!isset($task['task_log_help_desk_id']) || (isset($task['task_log_help_desk_id']) && !$task['task_log_help_desk_id']) || $integrate_with_helpdesk){
 					?>
-						<a href="?m=timecard&tab=<?php echo isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id'] ? 2 : 1;?>&tid=<?php echo $task["task_log_id"]; ?>">[<?php echo $AppUI->_('Edit'); ?>]</a>
+						<a href="?m=timecard&tab=<?php echo isset($task['task_log_help_desk_id']) && $task['task_log_help_desk_id'] ? 5 : $newTLogTabNum;?>&tid=<?php echo $task["task_log_id"]; ?>">[<?php echo $AppUI->_('Edit'); ?>]</a>
 					<?php }
 						} ?>
 					<?php echo $task["task_log_description"]; ?></td>
-					<td align="right" valign="top"><?php echo $task["task_log_hours"]; ?></td>
+					<td align="right" valign="top"><?php echo number_format($task["task_log_hours"],2); ?></td>
 				</tr>
 				<?php
 			}
@@ -206,13 +213,13 @@
 	if ($show_possible_hours_worked && $total_hours_weekly<$min_hours_week) {
 		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($min_hours_week-$total_hours_weekly)."</span></b>";
 	}
-	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours_weekly."</span></b>";
+	echo "<b><span  style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".number_format($total_hours_weekly,1)."</span></b>";
 	echo "</td></tr>";
 	?>
 	</table>
 	</form>
 <?php
-function writeDayLine($day,$format,$task_string,$show_add,$userid)
+function writeDayLine($day,$format,$task_string,$show_add,$userid,$newTLogTabNum)
 {
 	$day_name = $day->getDayName(false);
 	echo "<tr><td nowrap=\"nowrap\" valign=\"top\" colspan=\"".($show_add?"2":"3")."\"  style=\"background-color:#D7EAFF;\">";
@@ -222,9 +229,7 @@ function writeDayLine($day,$format,$task_string,$show_add,$userid)
 	echo "</td>";
 	if($show_add){
 		echo "<td nowrap=\"nowrap\" align=\"center\"  style=\"background-color:#D7EAFF;\">";
-		//***MOD 20050525 pedroa echo "<a href=\"?m=timecard&tab=1&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
-		//***MOD 20050527 trimble echo "<a href=\"?m=timecard&tab=1&userid=".$_GET['user_id']."&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
-		echo "<a href=\"?m=timecard&tab=1&userid=".$userid."&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
+		echo "<a href=\"?m=timecard&tab=".$newTLogTabNum."&userid=".$userid."&date=".urlencode($day->getDate())."\">[".$task_string."]</a>";
 		echo "</td>";
 	}
 	echo "</tr>";
@@ -235,9 +240,9 @@ function writeDayTotal($total_string,$workday,$total_hours,$hours_per_day, $show
 	echo "<tr><td colspan=\"2\" align=\"right\"><b>".$total_string."</b></td>";
 	echo "<td align=\"right\" >";
 	if($show_possible_hours_worked && $total_hours<$hours_per_day && $workday){
-		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".($hours_per_day-$total_hours)."</span></b>";
+		echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid red;background-color:#FFF2F2;\">".number_format($hours_per_day-$total_hours,1)."</span></b>";
 	}
-	echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".$total_hours."</span></b>";
+	echo "<b><span style=\"padding-left: 5px;padding-right:5px;border:2px solid #999999;\"> ".number_format($total_hours,1)."</span></b>";
 	echo "</td></tr>";
 }
 

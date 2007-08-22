@@ -1,4 +1,4 @@
-<?php
+<?php /* HELPDESK $Id: configure.php,v 1.7 2007/08/22 1:21 PM arcos Exp $ */
 
 //This file will write a php config file to be included during execution of all timecard file for configuration.
 
@@ -45,7 +45,7 @@ $config_options = array(
 		'type' => 'checkbox'
 	),
 	'show_possible_hours_worked' => array(
-		'description' => $AppUI->_('Highlight the hours a user had not worked.'),
+		'description' => $AppUI->_('Highlight where users went into overtime.'),
 		'value' => 0,
 		'type' => 'checkbox'
 	)
